@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "../include/classFile.hpp"
-#include "../include/classLoader.hpp"
 
 int main(int argc, char * argv[]){
 
@@ -12,7 +11,7 @@ int main(int argc, char * argv[]){
 		std::cout << "Missing classfile name!";
 		return 1;
 	}
-	int ret = load_class(argv[1], classfile);
+	int ret = classfile.loadClass(argv[1]);
 
 	return 0;
 }

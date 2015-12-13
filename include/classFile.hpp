@@ -29,7 +29,7 @@ typedef struct {
     u1 tag;
     u1 info[];
 } cp_info;
-
+ 
 class ClassFile {
 
 	private:
@@ -37,7 +37,7 @@ class ClassFile {
 		u2             		minor_version;
 		u2             		major_version;
 		u2             		constant_pool_count;
-		cp_info      		* constant_pool; //[constant_pool_count-1]
+		cp_info      	 ** constant_pool; //[constant_pool_count-1]
 		u2             		access_flags;
 		u2             		this_class;
 		u2             		super_class;
@@ -51,7 +51,13 @@ class ClassFile {
 		attribute_info  * attributes; //[attributes_count]
 
 	public:
-
+		int loadClass(char * classFileName);
+		
+	private:
+		int loadConstants(char * &p);
+		int getConstantSize(char * &p);
+		int loadInterfaces(char * &p);
+		int loadFields(char * &p);
 };
 
 #endif /* CLASSFILE_HPP_ */
