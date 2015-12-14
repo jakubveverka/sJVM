@@ -12,7 +12,7 @@ int main(int argc, char * argv[]){
 		return 1;
 	}
 	int ret = classfile.loadClass(argv[1]);
-
+	std::cout << "Done: " << ret << std::endl;
 	return 0;
 }
 

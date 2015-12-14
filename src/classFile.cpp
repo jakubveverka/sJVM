@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 #include "../include/classFile.hpp"
 #include "../include/definitions.hpp"
@@ -11,8 +12,6 @@ int ClassFile::loadClass(char * classFileName)
 	int length;
 	char * p;
 
-	std::cout << classFileName << "wtf" << std::endl;
-
 	file.open(classFileName);
 
 	if(file.is_open())
@@ -21,10 +20,10 @@ int ClassFile::loadClass(char * classFileName)
 		length = file.tellg();
 		file.seekg(0, std::ios::beg);
 		p = new char[length];
-		file.read(p, length); 
+		file.read(p, length);
 		file.close();
-	} 
-	else 
+	}
+	else
 	{
 		std::cout << "File load failed!" << std::endl;
 		return 1;
@@ -57,24 +56,27 @@ int ClassFile::loadClass(char * classFileName)
 	{
 		loadFields(p);
 	}
-	/* 
-	* fields; //[fields_count]
-	methods_count;
+	methods_count = getu2(p); p += 2;
+	if(methods_count > 0)
+	{
+		loadMethods(p);
+	}
+	/*
 	*	methods; //[methods_count]
 	attributes_count;
 	* attributes; //[attributes_count]
 */
 
- 
+
 	return 0;
 }
 
 int ClassFile::loadConstants(char * &p)
 {
 	constant_pool = new cp_info*[constant_pool_count - 1];
-	for (int i = 0; i < constant_pool_count; ++i)
+	for (int i = 1; i < constant_pool_count; i++)
 	{
-		// Set the bytecode actual pointer here. 
+		// Set the bytecode actual pointer here.
 		// Need to be type casted to cp_info pointer
 		constant_pool[i] = (cp_info*)p;
 
@@ -137,7 +139,7 @@ int ClassFile::getConstantSize(char * &p)
 int ClassFile::loadInterfaces(char * &p)
 {
 	interfaces = new u2[interfaces_count];
-	for (int i = 0; i < interfaces_count; ++i)
+	for (int i = 0; i < interfaces_count; i++)
 	{
 		interfaces[i] = getu2(p); p += 2;
 	}
@@ -146,6 +148,88 @@ int ClassFile::loadInterfaces(char * &p)
 
 int ClassFile::loadFields(char * &p)
 {
+	fields = new field_info[fields_count];
+	for (int i = 0; i < fields_count; i++)
+	{
+		fields[i] . access_flags = getu2(p); p += 2;
+    fields[i] . name_index = getu2(p); p += 2;
+    fields[i] . descriptor_index = getu2(p); p += 2;
+    fields[i] . attributes_count = getu2(p); p += 2;
+    if(fields[i] . attributes_count > 0 )
+    {
+    	fields[i] . attributes = new attribute_info[attributes_count];
+	    for (int j = 0; j < attributes_count; j++)
+	    {
+	    	fields[i] . attributes[j] . attribute_name_index = getu2(p); p += 2;
+    		fields[i] . attributes[j] . attribute_length     = getu4(p); p += 4;
+    		if(fields[i] . attributes[j] . attribute_length > 0)
+    		{
+    			fields[i] . attributes[j] . info = new u1[fields[i] . attributes[j] . attribute_length];
+    			for (unsigned int k = 0; k < fields[i] . attributes[j] . attribute_length; k++)
+    			{
+    				fields[i] . attributes[j] . info[k] = getu1(p); p += 1;
+    			}
+    		}
+    	}
+	  }
+	}
+	return 0;
+}
 
+int ClassFile::getAttrName(u2 attr_name_index, std::string &attr_value)
+{
+	u1 * pN;
+
+	if(attr_name_index < 1 || attr_name_index > constant_pool_count)
+	{
+		return 1;
+	}
+	//pointer to constant in constant pool
+	pN = (u1 *)constant_pool[attr_name_index];
+
+	//get length of the string
+	int attr_name_length = getu2(pN + 1);
+	char * buffer = new char[attr_name_length + 1];
+	buffer[attr_name_length] = 0; // end string with 0
+	memcpy(buffer, pN + 3, attr_name_length);
+	attr_value = std::string(buffer);
+	return 0;
+}
+
+int ClassFile::loadMethods(char * &p)
+{
+	methods = new method_info_w_code[methods_count];
+	for (int i = 0; i < methods_count; i++)
+	{
+		methods[i] . access_flags 			= getu2(p); 	p += 2;
+    methods[i] . name_index 				= getu2(p); 	p += 2;
+    methods[i] . descriptor_index 	= getu2(p); 	p += 2;
+    methods[i] . attributes_count 	= getu2(p); 	p += 2;
+    if(methods[i] . attributes_count > 0)
+    {
+    	methods[i] . attributes = new attribute_info[methods[i] . attributes_count];
+    	for (int j = 0; j < methods[i] . attributes_count; j++)
+    	{
+    		methods[i] . attributes[j] . attribute_name_index = getu2(p); p += 2;
+    		methods[i] . attributes[j] . attribute_length 		= getu2(p); p += 2;
+    		if(methods[i] . attributes[j] . attribute_length > 0)
+    		{
+    			methods[i] . attributes[j] . info = new u1[methods[i] . attributes[j] . attribute_length];
+    			for (unsigned int k = 0; k < methods[i] . attributes[j] . attribute_length; k++)
+    			{
+    				methods[i] . attributes[j] . info[k] = getu1(p); p += 1;
+    			}
+    		}
+    		//if Attribute is "Code, save it to code_attr"
+	    	std::string attr_value;
+	    	getAttrName(methods[i] . attributes[j] . attribute_name_index, attr_value);
+	    	if(attr_value.compare("Code") == 0){
+	    		
+	    	}
+    	}
+
+    }
+
+  }
 	return 0;
 }
