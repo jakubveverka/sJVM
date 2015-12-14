@@ -36,38 +36,37 @@ int ClassFile::loadClass(char * classFileName)
 		return 1;
 	}
 
-	minor_version = 			getu2(p); p += 2;
-	major_version = 			getu2(p); p += 2;
+	minor_version 			= getu2(p); p += 2;
+	major_version 			=	getu2(p); p += 2;
 	constant_pool_count = getu2(p); p += 2;
 	if(constant_pool_count > 0)
 	{
 		loadConstants(p);
 	}
-	access_flags = 				getu2(p); p += 2;
-	this_class = 					getu2(p); p += 2;
-	super_class = 				getu2(p); p += 2;
-	interfaces_count = 		getu2(p); p += 2;
+	access_flags 				= getu2(p); p += 2;
+	this_class 					= getu2(p); p += 2;
+	super_class 				= getu2(p); p += 2;
+	interfaces_count 		= getu2(p); p += 2;
 	if(interfaces_count > 0)
 	{
 		loadInterfaces(p);
 	}
-	fields_count = 				getu2(p); p += 2;
+	fields_count 				= getu2(p); p += 2;
 	if(fields_count > 0)
 	{
 		loadFields(p);
 	}
-	methods_count = getu2(p); p += 2;
+	methods_count 			= getu2(p); p += 2;
 	if(methods_count > 0)
 	{
 		loadMethods(p);
 	}
-	/*
-	*	methods; //[methods_count]
-	attributes_count;
-	* attributes; //[attributes_count]
-*/
-
-
+	attributes_count 		= getu2(p); p += 2;
+	if(attributes_count > 0)
+	{
+		loadAttributes(p);
+	}
+	
 	return 0;
 }
 
@@ -202,34 +201,100 @@ int ClassFile::loadMethods(char * &p)
 	for (int i = 0; i < methods_count; i++)
 	{
 		methods[i] . access_flags 			= getu2(p); 	p += 2;
-    methods[i] . name_index 				= getu2(p); 	p += 2;
-    methods[i] . descriptor_index 	= getu2(p); 	p += 2;
-    methods[i] . attributes_count 	= getu2(p); 	p += 2;
-    if(methods[i] . attributes_count > 0)
-    {
-    	methods[i] . attributes = new attribute_info[methods[i] . attributes_count];
-    	for (int j = 0; j < methods[i] . attributes_count; j++)
-    	{
-    		methods[i] . attributes[j] . attribute_name_index = getu2(p); p += 2;
-    		methods[i] . attributes[j] . attribute_length 		= getu2(p); p += 2;
-    		if(methods[i] . attributes[j] . attribute_length > 0)
-    		{
-    			methods[i] . attributes[j] . info = new u1[methods[i] . attributes[j] . attribute_length];
-    			for (unsigned int k = 0; k < methods[i] . attributes[j] . attribute_length; k++)
-    			{
-    				methods[i] . attributes[j] . info[k] = getu1(p); p += 1;
-    			}
-    		}
-    		//if Attribute is "Code, save it to code_attr"
-	    	std::string attr_value;
-	    	getAttrName(methods[i] . attributes[j] . attribute_name_index, attr_value);
-	    	if(attr_value.compare("Code") == 0){
-	    		
+	    methods[i] . name_index 				= getu2(p); 	p += 2;
+	    methods[i] . descriptor_index 	= getu2(p); 	p += 2;
+	    methods[i] . attributes_count 	= getu2(p); 	p += 2;
+	    if(methods[i] . attributes_count > 0)
+	    {
+	    	methods[i] . attributes = new attribute_info[methods[i] . attributes_count];
+	    	for (int j = 0; j < methods[i] . attributes_count; j++)
+	    	{
+	    		methods[i] . attributes[j] . attribute_name_index = getu2(p); p += 2;
+	    		methods[i] . attributes[j] . attribute_length 		= getu4(p); p += 4;
+	    		if(methods[i] . attributes[j] . attribute_length > 0)
+	    		{
+	    			methods[i] . attributes[j] . info = new u1[methods[i] . attributes[j] . attribute_length];
+	    			for (unsigned int k = 0; k < methods[i] . attributes[j] . attribute_length; k++)
+	    			{
+	    				methods[i] . attributes[j] . info[k] = getu1(p); p += 1;
+	    			}
+	    		}
+	    		//if Attribute is "Code, save it to code_attr"
+		    	std::string attr_value;
+		    	getAttrName(methods[i] . attributes[j] . attribute_name_index, attr_value);
+		    	if(attr_value.compare("Code") == 0){
+		    		char * pA = (char *)methods[i] . attributes[j] . info;
+
+		    		methods[i] . code_attr = new Code_attribute;
+
+	    		    methods[i] . code_attr -> attribute_name_index 		= methods[i] . attributes[j] . attribute_name_index;
+				    methods[i] . code_attr -> attribute_length			= methods[i] . attributes[j] . attribute_length;
+				    methods[i] . code_attr -> max_stack					= getu2(pA); pA += 2;
+				    methods[i] . code_attr -> max_locals				= getu2(pA); pA += 2;
+				    methods[i] . code_attr -> code_length				= getu4(pA); pA += 4;
+				    if(methods[i] . code_attr -> code_length > 0)
+				    {
+				    	methods[i] . code_attr -> code = new u1[methods[i] . code_attr -> code_length];
+				    	memcpy(methods[i] . code_attr -> code, pA, methods[i] . code_attr -> code_length);
+				    }
+				    else
+				    {
+				    	methods[i] . code_attr -> code = NULL;
+				    }
+				    pA += methods[i] . code_attr -> code_length;
+				    methods[i] . code_attr -> exception_table_length	= getu2(pA); pA += 2;
+				    if(methods[i] . code_attr -> exception_table_length > 0)
+				    {
+				    	methods[i] . code_attr -> exception_table = new Exception_table[methods[i] . code_attr -> exception_table_length];
+				    	for (int l = 0; l < methods[i] . code_attr -> exception_table_length; l++)
+				    	{
+				    		methods[i] . code_attr -> exception_table[l] . start_pc 	= getu2(pA); pA += 2;
+							methods[i] . code_attr -> exception_table[l] . end_pc 		= getu2(pA); pA += 2;
+							methods[i] . code_attr -> exception_table[l] . handler_pc 	= getu2(pA); pA += 2;
+							methods[i] . code_attr -> exception_table[l] . catch_type 	= getu2(pA); pA += 2;
+				    	}
+				    }
+				    methods[i] . code_attr -> attributes_count = getu2(pA); pA += 2;
+				    if(methods[i] . code_attr -> attributes_count > 0)
+				    {
+					    methods[i] . code_attr -> attributes = new attribute_info[methods[i] . code_attr -> attributes_count];
+					    for (int m = 0; m < methods[i] . code_attr -> attributes_count; m++)
+					    {
+							methods[i] . code_attr -> attributes[m] . attribute_name_index 	= getu2(pA); pA += 2;
+							methods[i] . code_attr -> attributes[m] . attribute_length 		= getu4(pA); pA += 4;
+							if( methods[i] . code_attr -> attributes[m] . attribute_length > 0)
+							{
+								methods[i] . code_attr -> attributes[m] . info = new u1[methods[i] . code_attr -> attributes[m] . attribute_length];
+								for (unsigned int o = 0; o < methods[i] . code_attr -> attributes[m] . attribute_length; o++)
+								{
+									methods[i] . code_attr -> attributes[m] . info[o] = getu1(pA); pA += 1;
+								}
+							}
+					    }
+				    }
+		    	}
 	    	}
+	    }
+  	}
+	return 0;
+}
+
+int ClassFile::loadAttributes(char * &p)
+{
+	attributes = new attribute_info[attributes_count];
+
+	for (int i = 0; i < attributes_count; i++)
+	{
+		attributes[i] . attribute_name_index = getu2(p); p += 2;
+    attributes[i] . attribute_length		 = getu4(p); p += 4;
+    attributes[i] . info = new u1[attributes[i] . attribute_length];
+    if(attributes[i] . attribute_length > 0)
+    {
+    	for (unsigned int j = 0; j < attributes[i] . attribute_length; j++)
+    	{
+    		attributes[i] . info[j] = getu1(p); p += 1;
     	}
-
     }
-
-  }
+	}
 	return 0;
 }

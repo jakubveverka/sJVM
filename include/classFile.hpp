@@ -12,9 +12,9 @@ struct attribute_info;
 // help struct for Code_attribute
 typedef struct Exception_table{
 	u2 start_pc;
-  u2 end_pc;
-  u2 handler_pc;
-  u2 catch_type;
+	u2 end_pc;
+	u2 handler_pc;
+	u2 catch_type;
 } Exception_table;
 
 typedef struct Code_attribute {
@@ -96,6 +96,7 @@ class ClassFile {
 		int loadFields(char * &p);
 		int loadMethods(char * &p);
 		int getAttrName(u2 attr_name_index, std::string &attr_name);
+		int loadAttributes(char * &p);
 };
 
 #endif /* CLASSFILE_HPP_ */
