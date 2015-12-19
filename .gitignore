@@ -5,3 +5,6 @@ lib/*
 
 # Ignore any executables
 bin/*
+
+# Ignore SublimeText project files
+run.sublime*

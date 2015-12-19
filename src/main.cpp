@@ -4,14 +4,20 @@
 
 int main(int argc, char * argv[]){
 
-	ClassFile classfile;
-
-	//std::cout << (char *)argv[2];
 	if(argc < 2){
 		std::cout << "Missing classfile name!";
 		return 1;
 	}
-	int ret = classfile.loadClass(argv[1]);
+	
+	ClassFile classfile;
+
+	classfile.
+
+	StackFrame stackFrame = new StackFrame();
+	ClassStorage classStorage = new ClassStorage();
+
+	Frame initFrame = new Frame("main", argv[1], stackFrame, classStorage);
+	
 	std::cout << "Done: " << ret << std::endl;
 	return 0;
 }

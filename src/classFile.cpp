@@ -249,9 +249,9 @@ int ClassFile::loadMethods(char * &p)
 				    	for (int l = 0; l < methods[i] . code_attr -> exception_table_length; l++)
 				    	{
 				    		methods[i] . code_attr -> exception_table[l] . start_pc 	= getu2(pA); pA += 2;
-							methods[i] . code_attr -> exception_table[l] . end_pc 		= getu2(pA); pA += 2;
-							methods[i] . code_attr -> exception_table[l] . handler_pc 	= getu2(pA); pA += 2;
-							methods[i] . code_attr -> exception_table[l] . catch_type 	= getu2(pA); pA += 2;
+								methods[i] . code_attr -> exception_table[l] . end_pc 		= getu2(pA); pA += 2;
+								methods[i] . code_attr -> exception_table[l] . handler_pc 	= getu2(pA); pA += 2;
+								methods[i] . code_attr -> exception_table[l] . catch_type 	= getu2(pA); pA += 2;
 				    	}
 				    }
 				    methods[i] . code_attr -> attributes_count = getu2(pA); pA += 2;
@@ -260,16 +260,16 @@ int ClassFile::loadMethods(char * &p)
 					    methods[i] . code_attr -> attributes = new attribute_info[methods[i] . code_attr -> attributes_count];
 					    for (int m = 0; m < methods[i] . code_attr -> attributes_count; m++)
 					    {
-							methods[i] . code_attr -> attributes[m] . attribute_name_index 	= getu2(pA); pA += 2;
-							methods[i] . code_attr -> attributes[m] . attribute_length 		= getu4(pA); pA += 4;
-							if( methods[i] . code_attr -> attributes[m] . attribute_length > 0)
-							{
-								methods[i] . code_attr -> attributes[m] . info = new u1[methods[i] . code_attr -> attributes[m] . attribute_length];
-								for (unsigned int o = 0; o < methods[i] . code_attr -> attributes[m] . attribute_length; o++)
+								methods[i] . code_attr -> attributes[m] . attribute_name_index 	= getu2(pA); pA += 2;
+								methods[i] . code_attr -> attributes[m] . attribute_length 		= getu4(pA); pA += 4;
+								if( methods[i] . code_attr -> attributes[m] . attribute_length > 0)
 								{
-									methods[i] . code_attr -> attributes[m] . info[o] = getu1(pA); pA += 1;
+									methods[i] . code_attr -> attributes[m] . info = new u1[methods[i] . code_attr -> attributes[m] . attribute_length];
+									for (unsigned int o = 0; o < methods[i] . code_attr -> attributes[m] . attribute_length; o++)
+									{
+										methods[i] . code_attr -> attributes[m] . info[o] = getu1(pA); pA += 1;
+									}
 								}
-							}
 					    }
 				    }
 		    	}

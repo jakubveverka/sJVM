@@ -1,0 +1,5 @@
+#ifndef OPERANDSTACK_HPP_
+#define OPERANDSTACK_HPP_
+
+
+#endif /* OPERANDSTACK_HPP_ */
