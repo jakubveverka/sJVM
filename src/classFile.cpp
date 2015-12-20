@@ -5,14 +5,14 @@
 #include "../include/classFile.hpp"
 #include "../include/definitions.hpp"
 
-int ClassFile::loadClass(char * classFileName)
+int ClassFile::loadClass(std::string classFileName)
 {
 
 	std::ifstream file;
 	int length;
 	char * p;
 
-	file.open(classFileName);
+	file.open(classFileName.c_str());
 
 	if(file.is_open())
 	{
@@ -297,4 +297,18 @@ int ClassFile::loadAttributes(char * &p)
     }
 	}
 	return 0;
+}
+
+method_info_w_code ClassFile::getMethod(std::string methodName)
+{
+	for (int i = 0; i < methods_count; i++)
+	{
+		std::string name;
+		getAttrName(methods[i] . name_index, name);
+		if(name.compare(methodName) == 0)
+		{
+			return methods[i];
+		}
+	}
+	throw 20;
 }

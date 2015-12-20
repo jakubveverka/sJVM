@@ -1,11 +1,13 @@
-#ifndef FRAMESTACK_HPP_
-#define FRAMESTACK_HPP_
+#ifndef STACKFRAME_HPP_
+#define STACKFRAME_HPP_
 
-class FrameStack{
+#include "frame.hpp"
+
+class StackFrame{
 	private:
 		std::vector<Frame> stack;
 	public:
 		
 };
 
-#endif /* FRAMESTACK_HPP_ */
+#endif /* STACKFRAME_HPP_ */

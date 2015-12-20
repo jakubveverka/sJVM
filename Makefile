@@ -5,7 +5,7 @@ BIN 			:= bin
 TARGET 		:= bin/jvm
 
 SRCEXT    := cpp
-SOURCES   := $(wildcard $(SRCDIR)/*.$(SRCEXT))
+SOURCES   := $(wildcard $(SRCDIR)/*.$(SRCEXT)) $(wildcard $(SRCDIR)/operands/*.$(SRCEXT))
 OBJECTS   := $(subst $(SRCDIR),$(BUILDDIR),$(SOURCES:.cpp=.o))
 
 CFLAGS := -g -Wall
@@ -15,7 +15,7 @@ $(TARGET): $(OBJECTS) | $(BIN)
 	@echo " $(CC) $^ -o $(TARGET)"; $(CC) $^ -o $(TARGET) 
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(BUILDDIR)
+	@mkdir -p $(BUILDDIR) $(BUILDDIR)/operands
 	@echo " $(CC) $(CFLAGS) -c -o $@ $<"; $(CC) $(CFLAGS) -c -o $@ $<
 
 $(BIN):

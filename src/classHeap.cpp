@@ -1,14 +1,15 @@
 
 #include "../include/classHeap.hpp"
 #include "../include/classLoader.hpp"
+#include "../include/classFile.hpp"
 
 ClassFile * ClassHeap::getClass(std::string className)
 {
-	std::map<std::String, ClassFile>::iterator it;
+	std::map<std::string, ClassFile *>::iterator it;
 	it = classHeap.find(className);
 	if(it == classHeap.end())
 	{
-		classStorage[className] = classLoader.loadClass(className);
+		classHeap . insert( std::pair<std::string, ClassFile *>(className, classLoader.loadClass(className) ) );
 	}
-	return classStorage[className];
+	return classHeap[className];
 }

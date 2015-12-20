@@ -1,7 +1,10 @@
 #ifndef CLASSFILE_HPP_
 #define CLASSFILE_HPP_
 
+#include <string>
+
 #include "definitions.hpp"
+
 
 struct attribute_info;
 
@@ -87,8 +90,9 @@ class ClassFile {
 		attribute_info  		* attributes; //[attributes_count]
 
 	public:
-		int loadClass(char * classFileName);
-		
+		int loadClass(std::string classFileName);
+		method_info_w_code getMethod(std::string methodName);
+
 	private:
 		int loadConstants(char * &p);
 		int getConstantSize(char * &p);
@@ -97,6 +101,7 @@ class ClassFile {
 		int loadMethods(char * &p);
 		int getAttrName(u2 attr_name_index, std::string &attr_name);
 		int loadAttributes(char * &p);
+		
 };
 
 #endif /* CLASSFILE_HPP_ */
