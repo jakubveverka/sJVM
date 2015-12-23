@@ -73,8 +73,15 @@ void ExecutionUnit::execute()
 				break;
 			}
 			case 0x11:
+			{
 				DEBUG_MSG("executing: sipush");
+				u2 operand = getu2(p + frame->getPc() + 1);
+				DEBUG_MSG("sipush operand: " + std::to_string(operand));
+				IntOperand * pushOperand = new IntOperand(operand);
+				frame -> pushOperand(pushOperand);
+				frame -> movePc(3);
 				break;
+			}
 			case 0x12:
 				DEBUG_MSG("executing: LDC");
 				break;

@@ -4,7 +4,7 @@ class MulNumbers
         {
                 int x, y, z;
                 x = 2;
-                y = 3;
+                y = 300;
                 z = x * y;
         }
 }
