@@ -348,8 +348,19 @@ void ExecutionUnit::execute()
 			//case 0x67:
 				//TODO dsub
 			case 0x68:
+			{
 				DEBUG_MSG("executing: imul");
+				int firstOperand = frame -> topPopOperand() -> getValue();
+				DEBUG_MSG("imul: first operand: " + std::to_string(firstOperand));
+				int secondOperand = frame -> topPopOperand() -> getValue();
+				DEBUG_MSG("imul: second operand: " + std::to_string(secondOperand));
+
+				IntOperand * imulResult = new IntOperand(firstOperand * secondOperand);
+				DEBUG_MSG("imul: result " + std::to_string(imulResult->getValue()));
+				frame -> pushOperand (imulResult);
+				frame -> movePc(1);
 				break;
+			}
 			case 0x69:
 				DEBUG_MSG("executing: lmul");
 				break;
@@ -359,8 +370,19 @@ void ExecutionUnit::execute()
 			//case 0x6b:
 				//TODO dmul
 			case 0x6c:
+			{
 				DEBUG_MSG("executing: idiv");
+				int firstOperand = frame -> topPopOperand() -> getValue();
+				DEBUG_MSG("idiv: first operand: " + std::to_string(firstOperand));
+				int secondOperand = frame -> topPopOperand() -> getValue();
+				DEBUG_MSG("idiv: second operand: " + std::to_string(secondOperand));
+
+				IntOperand * idivResult = new IntOperand(secondOperand / firstOperand);
+				DEBUG_MSG("idiv: result " + std::to_string(idivResult->getValue()));
+				frame -> pushOperand(idivResult);
+				frame -> movePc(1);
 				break;
+			}
 			case 0x6d:
 				DEBUG_MSG("executing: ldiv");
 				break;
