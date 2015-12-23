@@ -8,3 +8,7 @@ bin/*
 
 # Ignore SublimeText project files
 run.sublime*
+
+.DS_Store
+include/.DS_Store
+src/.DS_Store

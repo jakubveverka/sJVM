@@ -1,5 +1,8 @@
 
+#include <iostream>
+
 #include "../include/frame.hpp"
+#include "../include/debugMsg.hpp"
 
 
 	Frame::Frame(std::string p_methodName, std::string p_className, std::stack<Frame*> p_stackFrame, ClassHeap * p_classHeap )
@@ -47,4 +50,13 @@ Operand * Frame::topPopOperand()
 	Operand * tmp = opStack.top();
 	opStack.pop();
 	return tmp;
+}
+
+void Frame::printOpStack()
+{
+	DEBUG_MSG("printing opStack:");
+	for (std::stack<Operand *> stackCopy = opStack; !stackCopy.empty(); stackCopy.pop()) {
+        DEBUG_MSG(stackCopy.top()->getValue());
+	}
+	DEBUG_MSG("end of printing");
 }

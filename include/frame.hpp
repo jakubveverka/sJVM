@@ -31,6 +31,7 @@ class Frame{
 		void			   storeOperand(int index, Operand *op);
 		Operand			 * loadOperand(int index);
 		Operand			 * topPopOperand();
+		void 				printOpStack();
 };
 
 #endif /* FRAME_HPP_ */
