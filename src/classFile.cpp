@@ -66,13 +66,13 @@ int ClassFile::loadClass(std::string classFileName)
 	{
 		loadAttributes(p);
 	}
-	
+
 	return 0;
 }
 
 int ClassFile::loadConstants(char * &p)
 {
-	constant_pool = new cp_info*[constant_pool_count - 1];
+	constant_pool = new cp_info*[constant_pool_count];
 	for (int i = 1; i < constant_pool_count; i++)
 	{
 		// Set the bytecode actual pointer here.
@@ -206,12 +206,12 @@ int ClassFile::loadMethods(char * &p)
 	    methods[i] . attributes_count 	= getu2(p); 	p += 2;
 	    if(methods[i] . attributes_count > 0)
 	    {
-	    	methods[i] . attributes = new attribute_info[methods[i] . attributes_count];
+	    	//methods[i] . attributes = new attribute_info[methods[i] . attributes_count];
 	    	for (int j = 0; j < methods[i] . attributes_count; j++)
 	    	{
-	    		methods[i] . attributes[j] . attribute_name_index = getu2(p); p += 2;
-	    		methods[i] . attributes[j] . attribute_length 		= getu4(p); p += 4;
-	    		if(methods[i] . attributes[j] . attribute_length > 0)
+	    		/* methods[i] . attributes[j] . */ u2 attribute_name_index = getu2(p); p += 2;
+	    		/* methods[i] . attributes[j] . */ u4 attribute_length 		= getu4(p); p += 4;
+	    		/* if(methods[i] . attributes[j] . attribute_length > 0)
 	    		{
 	    			methods[i] . attributes[j] . info = new u1[methods[i] . attributes[j] . attribute_length];
 	    			for (unsigned int k = 0; k < methods[i] . attributes[j] . attribute_length; k++)
@@ -219,16 +219,17 @@ int ClassFile::loadMethods(char * &p)
 	    				methods[i] . attributes[j] . info[k] = getu1(p); p += 1;
 	    			}
 	    		}
+	    		*/
 	    		//if Attribute is "Code, save it to code_attr"
 		    	std::string attr_value;
-		    	getAttrName(methods[i] . attributes[j] . attribute_name_index, attr_value);
+		    	getAttrName( /*methods[i] . attributes[j] . */ attribute_name_index, attr_value);
 		    	if(attr_value.compare("Code") == 0){
-		    		char * pA = (char *)methods[i] . attributes[j] . info;
+		    		char * pA = p;//(char *)methods[i] . attributes[j] . info;
 
 		    		methods[i] . code_attr = new Code_attribute;
 
-	    		    methods[i] . code_attr -> attribute_name_index 		= methods[i] . attributes[j] . attribute_name_index;
-				    methods[i] . code_attr -> attribute_length			= methods[i] . attributes[j] . attribute_length;
+	    		    methods[i] . code_attr -> attribute_name_index 		= /* methods[i] . attributes[j] .*/ attribute_name_index;
+				    methods[i] . code_attr -> attribute_length			= /* methods[i] . attributes[j] .*/ attribute_length;
 				    methods[i] . code_attr -> max_stack					= getu2(pA); pA += 2;
 				    methods[i] . code_attr -> max_locals				= getu2(pA); pA += 2;
 				    methods[i] . code_attr -> code_length				= getu4(pA); pA += 4;
@@ -273,6 +274,7 @@ int ClassFile::loadMethods(char * &p)
 					    }
 				    }
 		    	}
+		    	p += attribute_length;
 	    	}
 	    }
   	}
@@ -299,13 +301,14 @@ int ClassFile::loadAttributes(char * &p)
 	return 0;
 }
 
-method_info_w_code ClassFile::getMethod(std::string methodName)
+method_info_w_code ClassFile::getMethod(std::string methodName, std::string methodDescription)
 {
 	for (int i = 0; i < methods_count; i++)
 	{
-		std::string name;
+		std::string name, description;
 		getAttrName(methods[i] . name_index, name);
-		if(name.compare(methodName) == 0)
+		getAttrName(methods[i] . descriptor_index, description);
+		if(name.compare(methodName) == 0 and description.compare(methodDescription) == 0)
 		{
 			return methods[i];
 		}

@@ -9,13 +9,10 @@
 	 ExecutionUnit::ExecutionUnit(std::stack<Frame*> p_frameStack)
 {
 	frameStack = p_frameStack;
-}	
+}
 
-void ExecutionUnit::execute()
+void ExecutionUnit::execute( Frame * frame)
 {
-	DEBUG_MSG("Executing" << std::endl);
-
-	Frame * frame = frameStack.top();
 
 	u1 *p = frame -> getMethod() . code_attr -> code;
 
@@ -76,10 +73,11 @@ void ExecutionUnit::execute()
 			case 0x14:
 				DEBUG_MSG("executing: ldc2_w");
 				break;
-				
+
 			// LOADS ///////////////////////////////////////////////////////////////
 			case 0x15:
 				DEBUG_MSG("executing: iload");
+				return;
 				break;
 			case 0x16:
 				DEBUG_MSG("executing: lload");
@@ -130,7 +128,7 @@ void ExecutionUnit::execute()
 			//case 0x28:
 				//TODO dload_2
 			//case 0x29:
-				//TODO dload_3		
+				//TODO dload_3
 			case 0x2a:
 				DEBUG_MSG("executing: aload_0");
 				break;
@@ -139,13 +137,13 @@ void ExecutionUnit::execute()
 				break;
 			case 0x2c:
 				DEBUG_MSG("executing: aload_2");
-				break;	
+				break;
 			case 0x2d:
 				DEBUG_MSG("executing: aload_3");
 				break;
 			case 0x2e:
 				DEBUG_MSG("executing: iaload");
-				break;		
+				break;
 			case 0x2f:
 				DEBUG_MSG("executing: laload");
 				break;
@@ -153,7 +151,7 @@ void ExecutionUnit::execute()
 				DEBUG_MSG("executing: faload");
 				break;
 			//case 0x31:
-				//TODO daload	
+				//TODO daload
 			case 0x32:
 				DEBUG_MSG("executing: aaload");
 				break;
@@ -162,11 +160,11 @@ void ExecutionUnit::execute()
 				break;
 			case 0x34:
 				DEBUG_MSG("executing: caload");
-				break;		
+				break;
 			case 0x35:
 				DEBUG_MSG("executing: saload");
 				break;
-				
+
 			// STORES //////////////////////////////////////////////////////////////
 			case 0x36:
 				DEBUG_MSG("executing: istore");
@@ -190,7 +188,7 @@ void ExecutionUnit::execute()
 			case 0x3e: // istore_3
 				DEBUG_MSG("executing: istore_<i>");
 				frame -> storeOperand((u1)p[frame -> getPc() - 0x3b], frame -> topPopOperand() );
-				frame -> movePc(1);				
+				frame -> movePc(1);
 				break;
 			case 0x3f:
 				DEBUG_MSG("executing: lstore_0");
@@ -217,13 +215,13 @@ void ExecutionUnit::execute()
 				DEBUG_MSG("executing: fstore_3");
 				break;
 			//case 0x47:
-				//TODO dstore_0	
+				//TODO dstore_0
 			//case 0x48:
-				//TODO dstore_1	
+				//TODO dstore_1
 			//case 0x49:
 				//TODO dstore_2
 			//case 0x4a:
-				//TODO dstore_3	
+				//TODO dstore_3
 			case 0x4b:
 				DEBUG_MSG("executing: astore_0");
 				break;
@@ -259,7 +257,7 @@ void ExecutionUnit::execute()
 			case 0x56:
 				DEBUG_MSG("executing: sastore");
 				break;
-				
+
 			// STACK ///////////////////////////////////////////////////////////////
 			case 0x57:
 				DEBUG_MSG("executing: pop");
@@ -271,7 +269,7 @@ void ExecutionUnit::execute()
 				DEBUG_MSG("executing: dup");
 				break;
 			//case 0x5a:
-				//TODO dup_x1 	
+				//TODO dup_x1
 			//case 0x5b:
 				//TODO dup_x2
 			//case 0x5c:
@@ -282,7 +280,7 @@ void ExecutionUnit::execute()
 				//TODO dup2_x2
 			//case 0x5f:
 				//TODO swap
-				
+
 			// MATH ////////////////////////////////////////////////////////////////
 			case 0x60:
 				DEBUG_MSG("executing: iadd");
@@ -297,7 +295,7 @@ void ExecutionUnit::execute()
 				DEBUG_MSG("executing: fadd");
 				break;
 			//case 0x63:
-				//TODO dadd  
+				//TODO dadd
 			case 0x64:
 				DEBUG_MSG("executing: isub");
 				break;
@@ -308,7 +306,7 @@ void ExecutionUnit::execute()
 				DEBUG_MSG("executing: fsub");
 				break;
 			//case 0x67:
-				//TODO dsub  
+				//TODO dsub
 			case 0x68:
 				DEBUG_MSG("executing: imul");
 				break;
@@ -330,75 +328,75 @@ void ExecutionUnit::execute()
 				DEBUG_MSG("executing: fdiv");
 				break;
 			//case 0x6f:
-				//TODO ddiv  
+				//TODO ddiv
 			case 0x70:
 				DEBUG_MSG("executing: irem");
 				break;
 			//case 0x71:
-				//TODO lrem  
+				//TODO lrem
 			//case 0x72:
-				//TODO frem  
+				//TODO frem
 			//case 0x73:
-				//TODO drem  
+				//TODO drem
 			case 0x74:
 				DEBUG_MSG("executing: ineg");
 				break;
 			//case 0x75:
-				//TODO lneg  
+				//TODO lneg
 			//case 0x76:
-				//TODO fneg  
+				//TODO fneg
 			//case 0x77:
-				//TODO dneg  
+				//TODO dneg
 			//case 0x78:
-				//TODO ishl  
+				//TODO ishl
 			//case 0x79:
-				//TODO lshl  
+				//TODO lshl
 			//case 0x7a:
-				//TODO ishr  
+				//TODO ishr
 			//case 0x7b:
-				//TODO lshr  
+				//TODO lshr
 			//case 0x7c:
-				//TODO iushr  
+				//TODO iushr
 			//case 0x7d:
-				//TODO lushr  
+				//TODO lushr
 			case 0x7e:
 				DEBUG_MSG("executing: iand");
 				break;
 			case 0x7f:
-				//TODO land  
+				//TODO land
 			case 0x80:
 				DEBUG_MSG("executing: ior");
 				break;
 			//case 0x81:
-				//TODO lor  
+				//TODO lor
 			case 0x82:
 				DEBUG_MSG("executing: ixor");
 				break;
 			//case 0x83:
-				//TODO lxor  
+				//TODO lxor
 			case 0x84:
 				DEBUG_MSG("executing: iinc");
 				break;
-				
+
 			// CONVERSIONS /////////////////////////////////////////////////////////
 			case 0x86:
 				DEBUG_MSG("executing: i2f");
 				break;
-				
+
 			// COMPARSIONS /////////////////////////////////////////////////////////
 			case 0x94:
 				DEBUG_MSG("executing: lcmp");
 				break;
 			case 0x95:
 				DEBUG_MSG("executing: fcml");
-				break;		
+				break;
 			case 0x96:
 				DEBUG_MSG("executing: fcmpg");
 				break;
 			//case 0x97:
-				//TODO dcmpl  
+				//TODO dcmpl
 			//case 0x98:
-				//TODO dcmpg  
+				//TODO dcmpg
 			case 0x99:
 				DEBUG_MSG("executing: ifeq");
 				break;
@@ -441,7 +439,7 @@ void ExecutionUnit::execute()
 			case 0xa6:
 				DEBUG_MSG("executing: if_acmpne");
 				break;
-				
+
 			// CONTROL /////////////////////////////////////////////////////////////
 			case 0xa7:
 				DEBUG_MSG("executing: goto");
@@ -459,7 +457,7 @@ void ExecutionUnit::execute()
 				DEBUG_MSG("executing: return");
 				return;
 				break;
-			
+
 			// REFERENCIS //////////////////////////////////////////////////////////
 			case 0xb2:
 				DEBUG_MSG("executing: getstatic");
@@ -481,6 +479,8 @@ void ExecutionUnit::execute()
 				break;
 			case 0xb8:
 				DEBUG_MSG("executing: invokestatic");
+				executeInvoke(frame);
+				frame -> movePc(3);
 				break;
 			case 0xb9:
 				DEBUG_MSG("executing: invokeinterface");
@@ -506,14 +506,14 @@ void ExecutionUnit::execute()
 				break;
 			//case 0xc0:
 				//TODO checkcast
-			case 0xc1: 
+			case 0xc1:
 				DEBUG_MSG("executing: instanceof");
 				break;
 			//case 0xc2:
 				//TODO monitorenter
 			//case 0xc3:
 				//TODO monitorexit
-				
+
 			// EXTENDED ////////////////////////////////////////////////////////////
 			case 0xc6:
 				DEBUG_MSG("executing: ifnull");
@@ -521,11 +521,88 @@ void ExecutionUnit::execute()
 			case 0xc7:
 				DEBUG_MSG("executing: ifnonull");
 				break;
-				
+
 			////////////////////////////////////////////////////////////////////////
 			default:
 				break;
-		
+
 		}
 	}
+
+	frameStack.pop();
+}
+
+void ExecutionUnit::executeInvoke(Frame * frame)
+{
+
+	// get reference of method to class constant pool: invokestatic, indexbyte1, indexbyte2
+	u2 classConstRef = getu2(&frame -> getMethod() . code_attr -> code[frame -> getPc() + 1]);
+
+	// get constant_pool entry on this reference. Its CONSTANT_Methodref_info structure
+	u1 * p_methodRefInfo = (u1*)frame -> javaClass -> constant_pool[classConstRef];
+
+	// get info from this constant_pool entry about method
+	u2 classIndex  	    = getu2(p_methodRefInfo + 1);
+	u2 nameAndTypeIndex = getu2(p_methodRefInfo + 3);
+
+	// get class on this classIndex
+	u1 * p_classInfo = (u1*)frame -> javaClass -> constant_pool[classIndex];
+
+	// get name_index of this class (ref to constant_pool with class name)
+	u2 nameIndexClass = getu2(p_classInfo + 1);
+
+	// get string name of this class from constant pool
+	std::string className;
+	frame -> javaClass -> getAttrName(nameIndexClass, className);
+
+	// load class with that className
+	//ClassFile * javaClass = frame -> classHeap.getClass(className);
+
+	// get NameAndType_Info structure from constant pool
+	u1 *p_nameAndTypeInfo = (u1*)frame -> javaClass -> constant_pool[nameAndTypeIndex];
+
+	// get name_index and descriptor_index of this method
+	u2 nameIndexMethod = getu2(p_nameAndTypeInfo + 1);
+	u2 descriptorIndex = getu2(p_nameAndTypeInfo + 3);
+
+	// get string name and description of method
+	std::string methodName, methodDescription;
+	frame -> javaClass -> getAttrName(nameIndexMethod, methodName);
+	frame -> javaClass -> getAttrName(descriptorIndex, methodDescription);
+
+	Frame * invokedFrame = new Frame(methodName, methodDescription, className, frame -> stackFrame, frame -> classHeap);
+
+	u2 numberOfparams = getNumberOfMethodParams(methodDescription);
+
+	for (int i = numberOfparams - 1; i >= 0; i--)
+	{
+		//invokedFrame -> storeOperand( i, frame -> topPopOperand());
+	}
+
+	frameStack.push(invokedFrame);
+
+	execute(invokedFrame);
+}
+
+u2 ExecutionUnit::getNumberOfMethodParams(std::string p_description)
+{
+	u2 	count = 0;
+	int length = p_description.size();
+
+	for (int i = 1; i < length; i++)
+	{
+		if(p_description[i] == 'L')
+		{
+			while(p_description[i] != ';')
+			{
+				i++;
+			}
+		}
+		if(p_description[i] == ')')
+		{
+			break;
+		}
+		count++;
+	}
+	return count;
 }

@@ -6,6 +6,5 @@ class AddNumbers
 		x = 2;
 		y = 3;		
 		z = x + y;
-		System.out.println("Result " + z);
 	}
 }

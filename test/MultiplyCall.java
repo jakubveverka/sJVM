@@ -6,6 +6,6 @@ class MultiplyCall
 {
 	public static void main(String argc[])
 	{
-		int x = multiply5(4);
+		int x = multiply5(1, 2, 3);
 	}
 }
