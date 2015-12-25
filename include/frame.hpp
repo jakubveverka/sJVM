@@ -14,6 +14,7 @@ class StackFrame;
 class Frame{
 
 	private:
+	public:
 		std::vector<Operand*>  localVariables;
 		std::stack<Operand*>   opStack;
 		ClassFile 			 * javaClass;
@@ -22,8 +23,7 @@ class Frame{
 		ClassHeap			 * classHeap;
 		std::stack<Frame*>	   stackFrame;
 
-	public:
-		Frame(std::string p_methodName, std::string p_className, std::stack<Frame*> p_stackFrame, ClassHeap * p_classHeap );
+		Frame(std::string p_methodName, std::string p_methodDescription, std::string p_className, std::stack<Frame*> p_stackFrame, ClassHeap * p_classHeap );
 		method_info_w_code getMethod();
 		int				   getPc();
 		void 			   pushOperand(Operand *op);

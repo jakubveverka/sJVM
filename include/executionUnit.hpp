@@ -10,7 +10,9 @@ class ExecutionUnit{
 		std::stack<Frame*> frameStack;
 	public:
 			 ExecutionUnit(std::stack<Frame*> p_frameStack);
-		void execute();
+		void execute(Frame *);
+		void executeInvoke(Frame *);
+		u2	 getNumberOfMethodParams(std::string p_description);
 
 };
 

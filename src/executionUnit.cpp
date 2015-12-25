@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <cstring>
 
 #include "../include/debugMsg.hpp"
 #include "../include/executionUnit.hpp"
@@ -11,11 +12,8 @@
 	frameStack = p_frameStack;
 }
 
-void ExecutionUnit::execute()
+void ExecutionUnit::execute( Frame * frame)
 {
-	DEBUG_MSG("Executing" << std::endl);
-
-	Frame * frame = frameStack.top();
 
 	u1 *p = frame -> getMethod() . code_attr -> code;
 
@@ -433,6 +431,7 @@ void ExecutionUnit::execute()
 				//TODO fneg
 			//case 0x77:
 				//TODO dneg
+
 			case 0x78:
 			{
 				DEBUG_MSG("executing: ishl");
@@ -667,6 +666,8 @@ void ExecutionUnit::execute()
 				break;
 			case 0xb8:
 				DEBUG_MSG("executing: invokestatic");
+				executeInvoke(frame);
+				frame -> movePc(3);
 				break;
 			case 0xb9:
 				DEBUG_MSG("executing: invokeinterface");
@@ -711,7 +712,83 @@ void ExecutionUnit::execute()
 			////////////////////////////////////////////////////////////////////////
 			default:
 				break;
-
 		}
 	}
+
+	frameStack.pop();
+}
+
+void ExecutionUnit::executeInvoke(Frame * frame)
+{
+
+	// get reference of method to class constant pool: invokestatic, indexbyte1, indexbyte2
+	u2 classConstRef = getu2(&frame -> getMethod() . code_attr -> code[frame -> getPc() + 1]);
+
+	// get constant_pool entry on this reference. Its CONSTANT_Methodref_info structure
+	u1 * p_methodRefInfo = (u1*)frame -> javaClass -> constant_pool[classConstRef];
+
+	// get info from this constant_pool entry about method
+	u2 classIndex  	    = getu2(p_methodRefInfo + 1);
+	u2 nameAndTypeIndex = getu2(p_methodRefInfo + 3);
+
+	// get class on this classIndex
+	u1 * p_classInfo = (u1*)frame -> javaClass -> constant_pool[classIndex];
+
+	// get name_index of this class (ref to constant_pool with class name)
+	u2 nameIndexClass = getu2(p_classInfo + 1);
+
+	// get string name of this class from constant pool
+	std::string className;
+	frame -> javaClass -> getAttrName(nameIndexClass, className);
+
+	// load class with that className
+	//ClassFile * javaClass = frame -> classHeap.getClass(className);
+
+	// get NameAndType_Info structure from constant pool
+	u1 *p_nameAndTypeInfo = (u1*)frame -> javaClass -> constant_pool[nameAndTypeIndex];
+
+	// get name_index and descriptor_index of this method
+	u2 nameIndexMethod = getu2(p_nameAndTypeInfo + 1);
+	u2 descriptorIndex = getu2(p_nameAndTypeInfo + 3);
+
+	// get string name and description of method
+	std::string methodName, methodDescription;
+	frame -> javaClass -> getAttrName(nameIndexMethod, methodName);
+	frame -> javaClass -> getAttrName(descriptorIndex, methodDescription);
+
+	Frame * invokedFrame = new Frame(methodName, methodDescription, className, frame -> stackFrame, frame -> classHeap);
+
+	u2 numberOfparams = getNumberOfMethodParams(methodDescription);
+
+	for (int i = numberOfparams - 1; i >= 0; i--)
+	{
+		invokedFrame -> storeOperand( i, frame -> topPopOperand());
+	}
+
+	frameStack.push(invokedFrame);
+
+	execute(invokedFrame);
+}
+
+u2 ExecutionUnit::getNumberOfMethodParams(std::string p_description)
+{
+	u2 	count = 0;
+	int length = p_description.size();
+
+	for (int i = 1; i < length; i++)
+	{
+		if(p_description[i] == 'L')
+		{
+			while(p_description[i] != ';')
+			{
+				i++;
+			}
+		}
+		if(p_description[i] == ')')
+		{
+			break;
+		}
+		count++;
+	}
+	return count;
 }

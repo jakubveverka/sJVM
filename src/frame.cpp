@@ -1,3 +1,4 @@
+#include <iostream>
 
 #include <iostream>
 
@@ -5,12 +6,12 @@
 #include "../include/debugMsg.hpp"
 
 
-	Frame::Frame(std::string p_methodName, std::string p_className, std::stack<Frame*> p_stackFrame, ClassHeap * p_classHeap )
+	Frame::Frame(std::string p_methodName, std::string p_methodDescription, std::string p_className, std::stack<Frame*> p_stackFrame, ClassHeap * p_classHeap )
 {
 
 	classHeap = p_classHeap;
-	javaClass = classHeap -> getClass(p_className);
-	method    = javaClass -> getMethod(p_methodName);
+	javaClass = classHeap -> getClass(p_className + ".class");
+	method    = javaClass -> getMethod(p_methodName, p_methodDescription);
 	stackFrame = p_stackFrame;
 	localVariables.reserve(method . code_attr -> max_locals);
 	pc = 0;
@@ -28,6 +29,7 @@ int				   Frame::getPc()
 void Frame::pushOperand(Operand *op)
 {
 	opStack.push(op);
+	std::cout << opStack . size() << std::endl;
 }
 
 void Frame::movePc(int steps)
@@ -60,3 +62,4 @@ void Frame::printOpStack()
 	}
 	DEBUG_MSG("end of printing");
 }
+
