@@ -24,6 +24,8 @@ void ExecutionUnit::execute()
 
 	u1 firstBranchByte;
 	u1 secondBranchByte;
+	u1 thirdBranchByte;
+	u1 fourthBranchByte;
 
 	while(1)
 	{
@@ -338,7 +340,7 @@ void ExecutionUnit::execute()
 			case 0x64:
 			{
 				DEBUG_MSG("executing: isub");
-				getTwoStackOperands("isub", frame, firstOperand, secondOperand)
+				getTwoStackOperands("isub", frame, firstOperand, secondOperand);
 
 				IntOperand * isubResult = new IntOperand(secondOperand->getValue() - firstOperand->getValue());
 				DEBUG_MSG("isub: result " + std::to_string(isubResult->getValue()));
@@ -357,7 +359,7 @@ void ExecutionUnit::execute()
 			case 0x68:
 			{
 				DEBUG_MSG("executing: imul");
-				getTwoStackOperands("imul", frame, firstOperand, secondOperand)
+				getTwoStackOperands("imul", frame, firstOperand, secondOperand);
 
 				IntOperand * imulResult = new IntOperand(firstOperand->getValue() * secondOperand->getValue());
 				DEBUG_MSG("imul: result " + std::to_string(imulResult->getValue()));
@@ -376,7 +378,7 @@ void ExecutionUnit::execute()
 			case 0x6c:
 			{
 				DEBUG_MSG("executing: idiv");
-				getTwoStackOperands("idiv", frame, firstOperand, secondOperand)
+				getTwoStackOperands("idiv", frame, firstOperand, secondOperand);
 
 				IntOperand * idivResult = new IntOperand(secondOperand->getValue() / firstOperand->getValue());
 				DEBUG_MSG("idiv: result " + std::to_string(idivResult->getValue()));
@@ -395,7 +397,7 @@ void ExecutionUnit::execute()
 			case 0x70:
 			{
 				DEBUG_MSG("executing: irem");
-				getTwoStackOperands("irem", frame, firstOperand, secondOperand)
+				getTwoStackOperands("irem", frame, firstOperand, secondOperand);
 
 				IntOperand * iremResult = new IntOperand(secondOperand->getValue() - ((secondOperand->getValue() / firstOperand->getValue()) * firstOperand->getValue()));
 				DEBUG_MSG("irem: result " + std::to_string(iremResult->getValue()));
@@ -430,7 +432,7 @@ void ExecutionUnit::execute()
 			case 0x78:
 			{
 				DEBUG_MSG("executing: ishl");
-				getTwoStackOperands("ishl", frame, firstOperand, secondOperand)
+				getTwoStackOperands("ishl", frame, firstOperand, secondOperand);
 
 				IntOperand * ishlResult = new IntOperand(secondOperand->getValue() << (firstOperand->getValue() & 0x1f));
 				DEBUG_MSG("ishl: result " + std::to_string(ishlResult->getValue()));
@@ -443,7 +445,7 @@ void ExecutionUnit::execute()
 			case 0x7a:
 			{
 				DEBUG_MSG("executing: ishr"); //TODO test and implement for negative int
-				getTwoStackOperands("ishr", frame, firstOperand, secondOperand)
+				getTwoStackOperands("ishr", frame, firstOperand, secondOperand);
 
 				IntOperand * ishrResult = new IntOperand(secondOperand->getValue() >> (firstOperand->getValue() & 0x1f));
 				DEBUG_MSG("ishl: result " + std::to_string(ishrResult->getValue()));
@@ -456,7 +458,7 @@ void ExecutionUnit::execute()
 			case 0x7c:
 			{
 				DEBUG_MSG("executing: iushr"); //TODO test with negative int
-				getTwoStackOperands("iushr", frame, firstOperand, secondOperand)
+				getTwoStackOperands("iushr", frame, firstOperand, secondOperand);
 
 				IntOperand * result = new IntOperand((int)((unsigned int)secondOperand->getValue() >> (firstOperand->getValue() & 0x1f)));
 				DEBUG_MSG("ishl: result " + std::to_string(result->getValue()));
@@ -470,7 +472,7 @@ void ExecutionUnit::execute()
 			case 0x7e:
 			{
 				DEBUG_MSG("executing: iand");
-				getTwoStackOperands("iand", frame, firstOperand, secondOperand)
+				getTwoStackOperands("iand", frame, firstOperand, secondOperand);
 
 				IntOperand * result = new IntOperand(secondOperand->getValue() & firstOperand->getValue());
 				DEBUG_MSG("iand: result " + std::to_string(result->getValue()));
@@ -483,7 +485,7 @@ void ExecutionUnit::execute()
 			case 0x80:
 			{
 				DEBUG_MSG("executing: ior");
-				getTwoStackOperands("ior", frame, firstOperand, secondOperand)
+				getTwoStackOperands("ior", frame, firstOperand, secondOperand);
 
 				IntOperand * result = new IntOperand(secondOperand->getValue() | firstOperand->getValue());
 				DEBUG_MSG("ior: result " + std::to_string(result->getValue()));
@@ -496,7 +498,7 @@ void ExecutionUnit::execute()
 			case 0x82:
 			{
 				DEBUG_MSG("executing: ixor");
-				getTwoStackOperands("ixor", frame, firstOperand, secondOperand)
+				getTwoStackOperands("ixor", frame, firstOperand, secondOperand);
 
 				IntOperand * result = new IntOperand(secondOperand->getValue() ^ firstOperand->getValue());
 				DEBUG_MSG("ixor: result " + std::to_string(result->getValue()));
@@ -558,6 +560,8 @@ void ExecutionUnit::execute()
 				else if(pc == 0x9e) ifResult = firstOperandValue <= 0;
 				else DEBUG_MSG("unsuported given <cond> for if<cond>");
 
+				DEBUG_MSG("if<cond>: result: " + std::to_string(ifResult));
+
 				if(ifResult) {
 					getTwoBytesFromFrame("if<cond>", frame, p, firstBranchByte, secondBranchByte);
 					short offset = (firstBranchByte << 8) | secondBranchByte;
@@ -568,23 +572,38 @@ void ExecutionUnit::execute()
 				break;
 			}
 			case 0x9f:
-				DEBUG_MSG("executing: if_icmpeq");
-				break;
 			case 0xa0:
-				DEBUG_MSG("executing: if_icmpne");
-				break;
 			case 0xa1:
-				DEBUG_MSG("executing: if_icmplt");
-				break;
 			case 0xa2:
-				DEBUG_MSG("executing: if_icmpge");
-				break;
 			case 0xa3:
-				DEBUG_MSG("executing: if_icmpgt");
-				break;
 			case 0xa4:
-				DEBUG_MSG("executing: if_icmple");
+			{
+				DEBUG_MSG("executing: if_icmp<cond>");
+				getTwoStackOperands("if_icmp<cond>", frame, firstOperand, secondOperand);
+				int firstOperandValue = (int) firstOperand->getValue();
+				int secondOperandValue = (int) secondOperand->getValue();
+				bool ifResult = false;
+				u1 pc = p[frame -> getPc()];
+				DEBUG_MSG("if_icmp<cond>: pc: " + std::to_string(pc));
+				if (pc == 0x9f) ifResult = firstOperandValue == secondOperandValue;
+				else if(pc == 0xa0) ifResult = firstOperandValue != secondOperandValue;
+				else if(pc == 0xa1) ifResult = firstOperandValue > secondOperandValue;
+				else if(pc == 0xa2) ifResult = firstOperandValue <= secondOperandValue;
+				else if(pc == 0xa3) ifResult = firstOperandValue < secondOperandValue;
+				else if(pc == 0xa4) ifResult = firstOperandValue >= secondOperandValue;
+				else DEBUG_MSG("unsuported given <cond> for if_icmp<cond>");
+
+				DEBUG_MSG("if_icmp<cond>: result: " + std::to_string(ifResult));
+
+				if(ifResult) {
+					getTwoBytesFromFrame("if_icmp<cond>", frame, p, firstBranchByte, secondBranchByte);
+					short offset = (firstBranchByte << 8) | secondBranchByte;
+					frame->movePc(offset);
+				} else {
+					frame->movePc(3);
+				}
 				break;
+			}
 			case 0xa5:
 				DEBUG_MSG("executing: if_acmpeq");
 				break;
@@ -594,8 +613,21 @@ void ExecutionUnit::execute()
 
 			// CONTROL /////////////////////////////////////////////////////////////
 			case 0xa7:
+			{
 				DEBUG_MSG("executing: goto");
+				getTwoBytesFromFrame("goto", frame, p, firstBranchByte, secondBranchByte);
+				short offset = (firstBranchByte << 8) | secondBranchByte;
+				frame->movePc(offset);
 				break;
+			}
+			case 0xc8:
+			{
+				DEBUG_MSG("executing: goto_w");
+				getFourBytesFromFrame("goto_w", frame, p, firstBranchByte, secondBranchByte, thirdBranchByte, fourthBranchByte);
+				int offset = (firstBranchByte << 24) | (secondBranchByte << 16) | (thirdBranchByte << 8) | fourthBranchByte;
+				frame->movePc(offset);
+				break;
+			}
 			case 0xac:
 				DEBUG_MSG("executing: ireturn");
 				break;

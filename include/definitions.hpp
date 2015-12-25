@@ -45,3 +45,11 @@ typedef unsigned long		u8;
 	secondByte = (u1)p[frame -> getPc() + 2]; \
 	DEBUG_MSG(std::string(operation) + ": second byte: " + std::to_string(secondByte)); \
 };
+
+#define getFourBytesFromFrame(operation, frame, p, firstByte, secondByte, thirdByte, fourthByte) { \
+	getTwoBytesFromFrame(operation, frame, p, firstByte, secondByte); \
+	thirdByte = (u1)p[frame -> getPc() + 3]; \
+	DEBUG_MSG(std::string(operation) + ": third byte: " + std::to_string(thirdByte)); \
+	fourthByte = (u1)p[frame -> getPc() + 4]; \
+	DEBUG_MSG(std::string(operation) + ": fourt byte: " + std::to_string(fourthByte)); \
+};
