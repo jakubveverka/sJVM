@@ -632,8 +632,14 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			}
 			case 0xac:
-				DEBUG_MSG("executing: ireturn");
-				break;
+				{
+					DEBUG_MSG("executing: ireturn");
+					Operand * tmp = frame -> topPopOperand();
+					frameStack . pop();
+					frameStack . top() -> pushOperand(tmp);
+					return;
+					break;
+				}
 			case 0xad:
 				DEBUG_MSG("executing: lreturn");
 				break;
