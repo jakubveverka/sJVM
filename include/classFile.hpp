@@ -72,6 +72,7 @@ typedef struct cp_info{
 class ClassFile {
 
 	private:
+	public:
 		u4             				magic;
 		u2             				minor_version;
 		u2             				major_version;
@@ -89,17 +90,17 @@ class ClassFile {
 		u2             				attributes_count;
 		attribute_info  		* attributes; //[attributes_count]
 
-	public:
 		int loadClass(std::string classFileName);
-		method_info_w_code getMethod(std::string methodName);
+		method_info_w_code getMethod(std::string methodName, std::string methodDescription);
 
+		int getAttrName(u2 attr_name_index, std::string &attr_name);
+		
 	private:
 		int loadConstants(char * &p);
 		int getConstantSize(char * &p);
 		int loadInterfaces(char * &p);
 		int loadFields(char * &p);
 		int loadMethods(char * &p);
-		int getAttrName(u2 attr_name_index, std::string &attr_name);
 		int loadAttributes(char * &p);
 		
 };

@@ -12,7 +12,7 @@ public class Func {
         return ret;
     }
 
-    public static int multiply5(int number){
+    public static int multiply5(int number, int number2, int number3){
         int ret = 0;
         for (int i = 0; i < 5; i++) {
             ret+=number;

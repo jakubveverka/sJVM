@@ -1,3 +1,6 @@
+#include <string>
+#include <iostream>
+
 #define DEBUG
 
 #ifdef DEBUG
