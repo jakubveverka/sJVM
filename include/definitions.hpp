@@ -1,3 +1,4 @@
+#include "debugMsg.hpp"
 
 typedef unsigned char  	u1;
 typedef unsigned short	u2;
@@ -30,3 +31,10 @@ typedef unsigned long		u8;
 	((u4)((p)[2]) << 8  & 0x0000FF00) | \
 	((u4)((p)[3])	    & 0x000000FF)   \
 	);
+
+#define getTwoStackOperands(operation, frame, firstOperand, secondOperand) { \
+	firstOperand = frame->topPopOperand(); \
+	DEBUG_MSG(std::string(operation) + ": first operand: " + std::to_string(firstOperand->getValue())); \
+	secondOperand = frame->topPopOperand(); \
+	DEBUG_MSG(std::string(operation) + ": second operand: " + std::to_string(secondOperand->getValue())); \
+};

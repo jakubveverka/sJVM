@@ -5,6 +5,10 @@
 {
 
 }
+	IntOperand::~IntOperand()
+{
+
+}
 
 int IntOperand::getValue() const
 {

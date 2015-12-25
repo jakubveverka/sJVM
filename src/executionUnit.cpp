@@ -19,6 +19,9 @@ void ExecutionUnit::execute()
 
 	u1 *p = frame -> getMethod() . code_attr -> code;
 
+	Operand * firstOperand;
+	Operand * secondOperand;
+
 	while(1)
 	{
 		switch(p[frame -> getPc()])
@@ -66,8 +69,8 @@ void ExecutionUnit::execute()
 			case 0x10:
 			{
 				DEBUG_MSG("executing: bipush");
-				DEBUG_MSG("bipush operand: " + std::to_string((u1)(p[frame->getPc()+1])));
-				IntOperand * pushOperand = new IntOperand((u1)(p[frame->getPc()+1]));
+				DEBUG_MSG("bipush operand: " + std::to_string((int)((u1)(p[frame->getPc()+1]))));
+				IntOperand * pushOperand = new IntOperand((int)((u1)(p[frame->getPc()+1])));
 				frame -> pushOperand(pushOperand);
 				frame -> movePc(2);
 				break;
@@ -313,12 +316,9 @@ void ExecutionUnit::execute()
 			case 0x60:
 			{
 				DEBUG_MSG("executing: iadd");
-				int firstOperand = frame -> topPopOperand() -> getValue();
-				DEBUG_MSG("iadd: first operand: " + std::to_string(firstOperand));
-				int secondOperand = frame -> topPopOperand() -> getValue();
-				DEBUG_MSG("iadd: second operand: " + std::to_string(secondOperand));
+				getTwoStackOperands("iadd", frame, firstOperand, secondOperand);
 
-				IntOperand * iaddResult = new IntOperand(firstOperand + secondOperand);
+				IntOperand * iaddResult = new IntOperand(firstOperand->getValue() + secondOperand->getValue());
 				DEBUG_MSG("iadd: result " + std::to_string(iaddResult->getValue()));
 				frame -> pushOperand (iaddResult);
 				frame -> movePc(1);
@@ -335,12 +335,9 @@ void ExecutionUnit::execute()
 			case 0x64:
 			{
 				DEBUG_MSG("executing: isub");
-				int firstOperand = frame -> topPopOperand() -> getValue();
-				DEBUG_MSG("isub: first operand: " + std::to_string(firstOperand));
-				int secondOperand = frame -> topPopOperand() -> getValue();
-				DEBUG_MSG("isub: second operand: " + std::to_string(secondOperand));
+				getTwoStackOperands("isub", frame, firstOperand, secondOperand)
 
-				IntOperand * isubResult = new IntOperand(secondOperand - firstOperand);
+				IntOperand * isubResult = new IntOperand(secondOperand->getValue() - firstOperand->getValue());
 				DEBUG_MSG("isub: result " + std::to_string(isubResult->getValue()));
 				frame -> pushOperand (isubResult);
 				frame -> movePc(1);
@@ -357,12 +354,9 @@ void ExecutionUnit::execute()
 			case 0x68:
 			{
 				DEBUG_MSG("executing: imul");
-				int firstOperand = frame -> topPopOperand() -> getValue();
-				DEBUG_MSG("imul: first operand: " + std::to_string(firstOperand));
-				int secondOperand = frame -> topPopOperand() -> getValue();
-				DEBUG_MSG("imul: second operand: " + std::to_string(secondOperand));
+				getTwoStackOperands("imul", frame, firstOperand, secondOperand)
 
-				IntOperand * imulResult = new IntOperand(firstOperand * secondOperand);
+				IntOperand * imulResult = new IntOperand(firstOperand->getValue() * secondOperand->getValue());
 				DEBUG_MSG("imul: result " + std::to_string(imulResult->getValue()));
 				frame -> pushOperand (imulResult);
 				frame -> movePc(1);
@@ -379,12 +373,9 @@ void ExecutionUnit::execute()
 			case 0x6c:
 			{
 				DEBUG_MSG("executing: idiv");
-				int firstOperand = frame -> topPopOperand() -> getValue();
-				DEBUG_MSG("idiv: first operand: " + std::to_string(firstOperand));
-				int secondOperand = frame -> topPopOperand() -> getValue();
-				DEBUG_MSG("idiv: second operand: " + std::to_string(secondOperand));
+				getTwoStackOperands("idiv", frame, firstOperand, secondOperand)
 
-				IntOperand * idivResult = new IntOperand(secondOperand / firstOperand);
+				IntOperand * idivResult = new IntOperand(secondOperand->getValue() / firstOperand->getValue());
 				DEBUG_MSG("idiv: result " + std::to_string(idivResult->getValue()));
 				frame -> pushOperand(idivResult);
 				frame -> movePc(1);
@@ -399,8 +390,16 @@ void ExecutionUnit::execute()
 			//case 0x6f:
 				//TODO ddiv
 			case 0x70:
+			{
 				DEBUG_MSG("executing: irem");
+				getTwoStackOperands("irem", frame, firstOperand, secondOperand)
+
+				IntOperand * iremResult = new IntOperand(secondOperand->getValue() - ((secondOperand->getValue() / firstOperand->getValue()) * firstOperand->getValue()));
+				DEBUG_MSG("irem: result " + std::to_string(iremResult->getValue()));
+				frame -> pushOperand(iremResult);
+				frame -> movePc(1);
 				break;
+			}
 			//case 0x71:
 				//TODO lrem
 			//case 0x72:
@@ -408,45 +407,114 @@ void ExecutionUnit::execute()
 			//case 0x73:
 				//TODO drem
 			case 0x74:
-				DEBUG_MSG("executing: ineg");
+			{
+				DEBUG_MSG("executing: ineg"); //TODO test
+				firstOperand = frame->topPopOperand();
+				DEBUG_MSG("ineg: first operand: " + std::to_string(firstOperand->getValue()));
+
+				IntOperand * result = new IntOperand(~firstOperand->getValue());
+				DEBUG_MSG("ishl: result " + std::to_string(result->getValue()));
+				frame -> pushOperand(result);
+				frame -> movePc(1);
 				break;
+			}
 			//case 0x75:
 				//TODO lneg
 			//case 0x76:
 				//TODO fneg
 			//case 0x77:
 				//TODO dneg
-			//case 0x78:
-				//TODO ishl
+			case 0x78:
+			{
+				DEBUG_MSG("executing: ishl");
+				getTwoStackOperands("ishl", frame, firstOperand, secondOperand)
+
+				IntOperand * ishlResult = new IntOperand(secondOperand->getValue() << (firstOperand->getValue() & 0x1f));
+				DEBUG_MSG("ishl: result " + std::to_string(ishlResult->getValue()));
+				frame -> pushOperand(ishlResult);
+				frame -> movePc(1);
+				break;
+			}
 			//case 0x79:
 				//TODO lshl
-			//case 0x7a:
-				//TODO ishr
+			case 0x7a:
+			{
+				DEBUG_MSG("executing: ishr"); //TODO test and implement for negative int
+				getTwoStackOperands("ishr", frame, firstOperand, secondOperand)
+
+				IntOperand * ishrResult = new IntOperand(secondOperand->getValue() >> (firstOperand->getValue() & 0x1f));
+				DEBUG_MSG("ishl: result " + std::to_string(ishrResult->getValue()));
+				frame -> pushOperand(ishrResult);
+				frame -> movePc(1);
+				break;
+			}
 			//case 0x7b:
 				//TODO lshr
-			//case 0x7c:
-				//TODO iushr
-			//case 0x7d:
-				//TODO lushr
-			case 0x7e:
-				DEBUG_MSG("executing: iand");
+			case 0x7c:
+			{
+				DEBUG_MSG("executing: iushr"); //TODO test with negative int
+				getTwoStackOperands("iushr", frame, firstOperand, secondOperand)
+
+				IntOperand * result = new IntOperand((int)((unsigned int)secondOperand->getValue() >> (firstOperand->getValue() & 0x1f)));
+				DEBUG_MSG("ishl: result " + std::to_string(result->getValue()));
+				frame -> pushOperand(result);
+				frame -> movePc(1);
 				break;
+			}
+			case 0x7d:
+				DEBUG_MSG("executing: lushr");
+				break;
+			case 0x7e:
+			{
+				DEBUG_MSG("executing: iand");
+				getTwoStackOperands("iand", frame, firstOperand, secondOperand)
+
+				IntOperand * result = new IntOperand(secondOperand->getValue() & firstOperand->getValue());
+				DEBUG_MSG("iand: result " + std::to_string(result->getValue()));
+				frame -> pushOperand(result);
+				frame -> movePc(1);
+				break;
+			}
 			case 0x7f:
 				//TODO land
 			case 0x80:
+			{
 				DEBUG_MSG("executing: ior");
+				getTwoStackOperands("ior", frame, firstOperand, secondOperand)
+
+				IntOperand * result = new IntOperand(secondOperand->getValue() | firstOperand->getValue());
+				DEBUG_MSG("ior: result " + std::to_string(result->getValue()));
+				frame -> pushOperand(result);
+				frame -> movePc(1);
 				break;
+			}
 			//case 0x81:
 				//TODO lor
 			case 0x82:
+			{
 				DEBUG_MSG("executing: ixor");
+				getTwoStackOperands("ixor", frame, firstOperand, secondOperand)
+
+				IntOperand * result = new IntOperand(secondOperand->getValue() ^ firstOperand->getValue());
+				DEBUG_MSG("ixor: result " + std::to_string(result->getValue()));
+				frame -> pushOperand(result);
+				frame -> movePc(1);
 				break;
+			}
 			//case 0x83:
 				//TODO lxor
 			case 0x84:
+			{
 				DEBUG_MSG("executing: iinc");
+				DEBUG_MSG("iinc: index: " + std::to_string(p[frame -> getPc()+1]));
+				DEBUG_MSG("iinc: const: " + std::to_string(p[frame -> getPc()+2]));
+				Operand * operand = frame -> loadOperand(p[frame -> getPc()+1]);
+				DEBUG_MSG("iinc: old operand value: " + std::to_string(operand->getValue()));
+				operand->setValue(operand->getValue() + p[frame -> getPc()+2]);
+				DEBUG_MSG("iinc: new operand value: " + std::to_string(operand->getValue()));
+				frame -> movePc(3);
 				break;
-
+			}
 			// CONVERSIONS /////////////////////////////////////////////////////////
 			case 0x86:
 				DEBUG_MSG("executing: i2f");
