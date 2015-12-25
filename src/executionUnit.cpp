@@ -22,6 +22,9 @@ void ExecutionUnit::execute()
 	Operand * firstOperand;
 	Operand * secondOperand;
 
+	u1 firstBranchByte;
+	u1 secondBranchByte;
+
 	while(1)
 	{
 		switch(p[frame -> getPc()])
@@ -535,23 +538,35 @@ void ExecutionUnit::execute()
 			//case 0x98:
 				//TODO dcmpg
 			case 0x99:
-				DEBUG_MSG("executing: ifeq");
-				break;
 			case 0x9a:
-				DEBUG_MSG("executing: ifne");
-				break;
 			case 0x9b:
-				DEBUG_MSG("executing: iflt");
-				break;
 			case 0x9c:
-				DEBUG_MSG("executing: ifge");
-				break;
 			case 0x9d:
-				DEBUG_MSG("executing: ifgt");
-				break;
 			case 0x9e:
-				DEBUG_MSG("executing: ifle");
+			{
+				DEBUG_MSG("executing: if<cond>");
+				int firstOperandValue = (int)frame->topPopOperand()->getValue();
+				bool ifResult = false;
+				u1 pc = p[frame -> getPc()];
+				DEBUG_MSG("if<cond>: pc: " + std::to_string(pc));
+				DEBUG_MSG("if<cond>: operand: " + std::to_string(firstOperandValue));
+				if (pc == 0x99) ifResult = firstOperandValue == 0;
+				else if(pc == 0x9a) ifResult = firstOperandValue != 0;
+				else if(pc == 0x9b) ifResult = firstOperandValue < 0;
+				else if(pc == 0x9c) ifResult = firstOperandValue >= 0;
+				else if(pc == 0x9d) ifResult = firstOperandValue > 0;
+				else if(pc == 0x9e) ifResult = firstOperandValue <= 0;
+				else DEBUG_MSG("unsuported given <cond> for if<cond>");
+
+				if(ifResult) {
+					getTwoBytesFromFrame("if<cond>", frame, p, firstBranchByte, secondBranchByte);
+					short offset = (firstBranchByte << 8) | secondBranchByte;
+					frame->movePc(offset);
+				} else {
+					frame->movePc(3);
+				}
 				break;
+			}
 			case 0x9f:
 				DEBUG_MSG("executing: if_icmpeq");
 				break;

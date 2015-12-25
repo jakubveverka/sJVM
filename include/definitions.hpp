@@ -38,3 +38,10 @@ typedef unsigned long		u8;
 	secondOperand = frame->topPopOperand(); \
 	DEBUG_MSG(std::string(operation) + ": second operand: " + std::to_string(secondOperand->getValue())); \
 };
+
+#define getTwoBytesFromFrame(operation, frame, p, firstByte, secondByte) { \
+	firstByte = (u1)p[frame -> getPc() + 1]; \
+	DEBUG_MSG(std::string(operation) + ": first byte: " + std::to_string(firstByte)); \
+	secondByte = (u1)p[frame -> getPc() + 2]; \
+	DEBUG_MSG(std::string(operation) + ": second byte: " + std::to_string(secondByte)); \
+};
