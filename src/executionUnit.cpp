@@ -102,6 +102,10 @@ void ExecutionUnit::execute()
 			// LOADS ///////////////////////////////////////////////////////////////
 			case 0x15:
 				DEBUG_MSG("executing: iload");
+				DEBUG_MSG("iload index: " + std::to_string(p[frame -> getPc()+1]));
+				DEBUG_MSG("iload operand: " + std::to_string(frame->loadOperand(p[frame -> getPc()+1])->getValue()));
+				frame -> pushOperand(frame -> loadOperand(p[frame -> getPc()+1]));
+				frame -> movePc(2);
 				break;
 			case 0x16:
 				DEBUG_MSG("executing: lload");
