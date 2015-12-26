@@ -25,6 +25,12 @@ typedef unsigned long		u8;
 	((u2)((p)[0]) << 8  & 0x0000FF00) | \
 	     ((p)[1]) \
 	);
+
+	#define getShort(p) (short)( \
+		((short)((p)[0]) << 8  & 0x0000FF00) | \
+		     ((p)[1]) \
+		);
+
 #define getu4(p) (u4)( \
 	((u4)((p)[0]) << 24 & 0xFF000000) | \
 	((u4)((p)[1]) << 16 & 0x00FF0000) | \

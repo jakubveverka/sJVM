@@ -9,7 +9,7 @@ class ShiftTests
 
 		x = 16;
 		z = x >> y;
-		x = -16;
+		x = -196;
 		z = x >> y;
 		z = x >>> y;
 	}

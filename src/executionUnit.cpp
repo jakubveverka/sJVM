@@ -45,8 +45,8 @@ void ExecutionUnit::execute( Frame * frame)
 			case 0x8: //iconst_5
 			{
 				DEBUG_MSG("executing: iconst_<i>");
-				DEBUG_MSG("iconst_<i> operand: " + std::to_string((u1)(p[frame -> getPc()] - 0x03)));
-				frame -> pushOperand(new IntOperand((u1)(p[frame -> getPc()] - 0x03)));
+				DEBUG_MSG("iconst_<i> operand: " + std::to_string(p[frame -> getPc()] - 0x03));
+				frame -> pushOperand(new IntOperand(p[frame -> getPc()] - 0x03));
 				frame -> movePc(1);
 				break;
 			}
@@ -72,8 +72,8 @@ void ExecutionUnit::execute( Frame * frame)
 			case 0x10:
 			{
 				DEBUG_MSG("executing: bipush");
-				DEBUG_MSG("bipush operand: " + std::to_string((int)((u1)(p[frame->getPc()+1]))));
-				IntOperand * pushOperand = new IntOperand((int)((u1)(p[frame->getPc()+1])));
+				DEBUG_MSG("bipush operand: " + std::to_string((char)(p[frame->getPc()+1])));
+				IntOperand * pushOperand = new IntOperand((char)(p[frame->getPc()+1]));
 				frame -> pushOperand(pushOperand);
 				frame -> movePc(2);
 				break;
@@ -81,7 +81,7 @@ void ExecutionUnit::execute( Frame * frame)
 			case 0x11:
 			{
 				DEBUG_MSG("executing: sipush");
-				u2 operand = getu2(p + frame->getPc() + 1);
+				short operand = getShort(p + frame->getPc() + 1);
 				DEBUG_MSG("sipush operand: " + std::to_string(operand));
 				IntOperand * pushOperand = new IntOperand(operand);
 				frame -> pushOperand(pushOperand);
@@ -447,7 +447,7 @@ void ExecutionUnit::execute( Frame * frame)
 				//TODO lshl
 			case 0x7a:
 			{
-				DEBUG_MSG("executing: ishr"); //TODO test and implement for negative int
+				DEBUG_MSG("executing: ishr");
 				getTwoStackOperands("ishr", frame, firstOperand, secondOperand);
 
 				IntOperand * ishrResult = new IntOperand(secondOperand->getValue() >> (firstOperand->getValue() & 0x1f));
@@ -460,7 +460,7 @@ void ExecutionUnit::execute( Frame * frame)
 				//TODO lshr
 			case 0x7c:
 			{
-				DEBUG_MSG("executing: iushr"); //TODO test with negative int
+				DEBUG_MSG("executing: iushr");
 				getTwoStackOperands("iushr", frame, firstOperand, secondOperand);
 
 				IntOperand * result = new IntOperand((int)((unsigned int)secondOperand->getValue() >> (firstOperand->getValue() & 0x1f)));
