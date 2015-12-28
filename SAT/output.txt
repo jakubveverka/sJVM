@@ -1,0 +1,7 @@
+SAT splnitelny pro 11
+SAT splnitelny pro 100
+SAT splnitelny pro 101
+SAT splnitelny pro 110
+SAT splnitelny pro 111
+SAT splnitelny pro 1011
+SAT splnitelny pro 1111

@@ -12,3 +12,6 @@ run.sublime*
 .DS_Store
 include/.DS_Store
 src/.DS_Store
+
+SAT/.idea/*
+SAT/SAT.iml
