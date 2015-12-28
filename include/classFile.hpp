@@ -7,6 +7,7 @@
 
 
 struct attribute_info;
+class ClassHeap;
 
 /*
  * Attributes types
@@ -90,19 +91,27 @@ class ClassFile {
 		u2             				attributes_count;
 		attribute_info  		* attributes; //[attributes_count]
 
+		ClassHeap * classHeap;
+
 		int loadClass(std::string classFileName);
 		method_info_w_code getMethod(std::string methodName, std::string methodDescription);
+		ClassFile * 			 setClassByMethod(std::string p_methodName, std::string p_methodDescription);
 
-		int getAttrName(u2 attr_name_index, std::string &attr_name);
-		
+		int 				getAttrName(u2 attr_name_index, std::string &attr_name);
+		int 				getObjectSize();
+		int 				getFieldCount();
+								ClassFile(ClassHeap * pClassHeap) : classHeap(pClassHeap) {};
+		std::string getClassNameFromRef(u2 classNameIndex);
+		std::string getName();
+		int 				getFieldIndex(std::string fieldName);
+
 	private:
 		int loadConstants(char * &p);
 		int getConstantSize(char * &p);
 		int loadInterfaces(char * &p);
 		int loadFields(char * &p);
 		int loadMethods(char * &p);
-		int loadAttributes(char * &p);
-		
+		int loadAttributes(char * &p);		
 };
 
 #endif /* CLASSFILE_HPP_ */

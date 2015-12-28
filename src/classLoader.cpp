@@ -3,10 +3,10 @@
 
 #include "../include/classLoader.hpp"
 
-ClassFile * ClassLoader::loadClass(std::string className)
+ClassFile * ClassLoader::loadClass(std::string className, ClassHeap * classHeap)
 {
-	ClassFile * classfile = new ClassFile();
+	ClassFile * classfile = new ClassFile(classHeap);
 	std::cout << "Loading class: " << className << std::endl;
-	classfile -> loadClass(className);
+	classfile -> loadClass(className + ".class");
 	return classfile;  
 }

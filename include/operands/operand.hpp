@@ -5,8 +5,8 @@ class Operand{
 	private:
 
 	public:
-		virtual int getValue() const = 0;
-		virtual void setValue(int val) = 0;
+		virtual int getValue() const;
+		virtual void setValue(int val);
 		virtual ~Operand() {}
 };
 

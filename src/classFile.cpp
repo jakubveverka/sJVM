@@ -4,6 +4,7 @@
 
 #include "../include/classFile.hpp"
 #include "../include/definitions.hpp"
+#include "../include/classHeap.hpp"
 
 int ClassFile::loadClass(std::string classFileName)
 {
@@ -313,5 +314,100 @@ method_info_w_code ClassFile::getMethod(std::string methodName, std::string meth
 			return methods[i];
 		}
 	}
+	if(super_class != 0)
+	{
+		return classHeap -> getClass(getClassNameFromRef(super_class)) -> getMethod(methodName, methodDescription);
+	}
 	throw 20;
+}
+
+ClassFile * ClassFile::setClassByMethod(std::string p_methodName, std::string p_methodDescription)
+{
+	for (int i = 0; i < methods_count; i++)
+	{
+		std::string name, description;
+		getAttrName(methods[i] . name_index, name);
+		getAttrName(methods[i] . descriptor_index, description);
+		if(name.compare(p_methodName) == 0 and description.compare(p_methodDescription) == 0)
+		{
+			return this;
+		}
+	}
+	if(super_class != 0)
+	{
+		return classHeap -> getClass(getClassNameFromRef(super_class)) -> setClassByMethod(p_methodName, p_methodDescription);
+	}
+	throw 20;
+}
+
+
+int ClassFile::getObjectSize()
+{
+	int fieldCount = getFieldCount();
+	//Todo callculate size of different types;
+	return fieldCount;
+}
+
+int ClassFile::getFieldCount()
+{
+	if(super_class == 0)
+		return fields_count;
+	else
+		return fields_count + classHeap -> getClass(getClassNameFromRef(super_class)) -> getFieldCount();
+}
+
+std::string ClassFile::getClassNameFromRef(u2 classIndex)
+{
+	// get class info on this classIndex
+	u1 * p_classInfo = (u1*)constant_pool[classIndex];
+
+	// get name_index of this class (ref to constant_pool with class name)
+	u2 nameIndexClass = getu2(p_classInfo + 1);
+
+	// get string name of this class from constant pool
+	std::string className;
+	getAttrName(nameIndexClass, className);
+	return className;
+}
+
+std::string ClassFile::getName()
+{
+	// get class info on this classIndex
+	u1 * p_classInfo = (u1*)constant_pool[this_class];
+
+	// get name_index of this class (ref to constant_pool with class name)
+	u2 nameIndexClass = getu2(p_classInfo + 1);
+
+	// get string name of this class from constant pool
+	std::string className;
+	getAttrName(nameIndexClass, className);
+	return className;
+}
+
+int ClassFile::getFieldIndex(std::string fieldName)
+{
+	int fieldIndex = -1;
+	if(super_class != 0)
+	{		
+		std::string className = getClassNameFromRef(super_class);		
+		fieldIndex = classHeap -> getClass(className) -> getObjectSize();
+	}
+	for (int i = 0; i < fields_count; i++)
+	{
+		std::string fielNamePool;
+		getAttrName(fields[i] . name_index, fielNamePool);
+		if(fieldName.compare(fielNamePool) == 0)
+		{
+			std::cout << "IIIIIIIIII - " << i + fieldIndex << std::endl;
+			return i + fieldIndex;
+		}
+	}
+	if(super_class != 0)
+	{
+		std::string className = getClassNameFromRef(super_class);
+		fieldIndex = classHeap -> getClass(className) -> getFieldIndex(fieldName);
+	}
+	if(fieldIndex == -1)
+		std::cout << "FAAAAAAAAAAAAAAAAAAAIL" << std::endl;
+	return fieldIndex;
 }

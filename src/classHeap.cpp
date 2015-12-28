@@ -9,7 +9,8 @@ ClassFile * ClassHeap::getClass(std::string className)
 	it = classHeap.find(className);
 	if(it == classHeap.end())
 	{
-		classHeap . insert( std::pair<std::string, ClassFile *>(className, classLoader.loadClass(className) ) );
+		ClassFile * insertClass = classLoader.loadClass(className, this);
+		classHeap . insert( std::pair<std::string, ClassFile *>(insertClass -> getName(), insertClass ) );
 	}
 	return classHeap[className];
 }

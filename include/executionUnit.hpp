@@ -5,14 +5,22 @@
 
 #include "frame.hpp"
 
+class ObjectHeap;
+
 class ExecutionUnit{
 	private:
 		std::stack<Frame*> frameStack;
+		ObjectHeap       * objectHeap;
 	public:
-			 ExecutionUnit(std::stack<Frame*> p_frameStack);
+			 ExecutionUnit(std::stack<Frame*> p_frameStack, ObjectHeap * objectHeap);
 		void execute(Frame *);
-		void executeInvoke(Frame *);
+		void executeInvoke(Frame *, u1 type);
+		int  executeNew(Frame *);
+		int  executeNewArray(Frame *);
 		u2	 getNumberOfMethodParams(std::string p_description);
+		void putfield(Frame * frame);
+		void getField(Frame * frame);
+
 
 };
 

@@ -7,7 +7,7 @@ class ClassLoader{
 	private:
 
 	public:
-		ClassFile * loadClass(std::string className);
+		ClassFile * loadClass(std::string className, ClassHeap * classHeap);
 };
 
 #endif /* CLASSLOADER_HPP_ */

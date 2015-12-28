@@ -6,10 +6,13 @@
 #include "../include/executionUnit.hpp"
 #include "../include/definitions.hpp"
 #include "../include/operands/intOperand.hpp"
+#include "../include/operands/refOperand.hpp"
+#include "../include/objectHeap.hpp"
 
-	 ExecutionUnit::ExecutionUnit(std::stack<Frame*> p_frameStack)
+	 ExecutionUnit::ExecutionUnit(std::stack<Frame*> p_frameStack, ObjectHeap * p_objectHeap)
 {
 	frameStack = p_frameStack;
+	objectHeap = p_objectHeap;
 }
 
 void ExecutionUnit::execute( Frame * frame)
@@ -114,6 +117,10 @@ void ExecutionUnit::execute( Frame * frame)
 				//TODO dload
 			case 0x19:
 				DEBUG_MSG("executing: aload");
+				DEBUG_MSG("aload index: " + std::to_string(p[frame -> getPc()+1]));
+				DEBUG_MSG("aload operand: " + std::to_string(frame->loadOperand(p[frame -> getPc()+1])->getValue()));
+				frame -> pushOperand(frame -> loadOperand(p[frame -> getPc()+1]));
+				frame -> movePc(2);
 				break;
 			case 0x1a: // iload_0 - fallback to iload_3
 			case 0x1b: // iload_1 - fallback to iload_3
@@ -157,21 +164,28 @@ void ExecutionUnit::execute( Frame * frame)
 				//TODO dload_2
 			//case 0x29:
 				//TODO dload_3
-			case 0x2a:
-				DEBUG_MSG("executing: aload_0");
-				break;
-			case 0x2b:
-				DEBUG_MSG("executing: aload_1");
-				break;
-			case 0x2c:
-				DEBUG_MSG("executing: aload_2");
-				break;
-			case 0x2d:
-				DEBUG_MSG("executing: aload_3");
+			case 0x2a: // aload_0
+			case 0x2b: // aload_1
+			case 0x2c: // aload_2
+			case 0x2d: // aload_3
+				DEBUG_MSG("executing: aload_<i>");
+				DEBUG_MSG("aload_<i> index: " + std::to_string(p[frame -> getPc()] - 0x2a));
+				DEBUG_MSG("aload_<i> operand: " + std::to_string(frame->loadOperand(p[frame -> getPc()] - 0x2a)->getValue()));
+				frame -> pushOperand(frame -> loadOperand(p[frame -> getPc()] - 0x2a));
+				frame -> movePc(1);
 				break;
 			case 0x2e:
-				DEBUG_MSG("executing: iaload");
-				break;
+				{
+					Operand * indexOp = frame -> topPopOperand();
+					Operand * refOp = frame -> topPopOperand();
+					Operand * valueOp = objectHeap -> loadArrayOp(refOp, indexOp);	
+					DEBUG_MSG("executing: iaload. Loaded value: " + std::to_string(valueOp -> getValue()) + 
+							  " from ref: " + std::to_string(refOp -> getValue()) +
+							  " on index: " + std::to_string(indexOp -> getValue()));
+					frame -> pushOperand(valueOp);
+					frame -> movePc(1);				
+					break;
+				}
 			case 0x2f:
 				DEBUG_MSG("executing: laload");
 				break;
@@ -213,8 +227,15 @@ void ExecutionUnit::execute( Frame * frame)
 			//case 0x39:
 				//TODO dstore
 			case 0x3a:
+			{
 				DEBUG_MSG("executing: astore");
+				DEBUG_MSG("astore index: " + std::to_string((u1)p[frame -> getPc() + 1]));
+				Operand * op = frame->topPopOperand();
+				DEBUG_MSG("astore operand: " + std::to_string(op->getValue()));
+				frame -> storeOperand((u1)p[frame -> getPc() + 1], op);
+				frame -> movePc(2);
 				break;
+			}
 			case 0x3b: // istore_0 - fallback to istore_3
 			case 0x3c: // istore_1 - fallback to istore_3
 			case 0x3d: // istore_2 - fallback to istore_3
@@ -261,22 +282,34 @@ void ExecutionUnit::execute( Frame * frame)
 			//case 0x4a:
 				//TODO dstore_3
 			case 0x4b:
-				DEBUG_MSG("executing: astore_0");
-				break;
 			case 0x4c:
-				DEBUG_MSG("executing: astore_1");
-				break;
 			case 0x4d:
-				DEBUG_MSG("executing: astore_2");
-				break;
 			case 0x4e:
-				DEBUG_MSG("executing: astore_3");
+			{
+				DEBUG_MSG("executing: astore_<i>");
+				DEBUG_MSG("astore_<i> index: " + std::to_string((u1)(p[frame -> getPc()] - 0x4b)));
+				Operand * op = frame->topPopOperand();
+				DEBUG_MSG("astore_<i> operand: " + std::to_string(op->getValue()));
+				frame -> storeOperand((u1)(p[frame -> getPc()] - 0x4b), op);
+				frame -> movePc(1);
 				break;
+			}
 			case 0x4f:
-				DEBUG_MSG("executing: iastore");
-				break;
+				{
+					Operand * valueOp = frame -> topPopOperand();
+					Operand * indexOp = frame -> topPopOperand();
+					Operand * refOp = frame -> topPopOperand();
+					DEBUG_MSG("executing: iastore. Storing value: " + std::to_string(valueOp -> getValue()) + 
+							  " from ref: " + std::to_string(refOp -> getValue()) +
+							  " on index: " + std::to_string(indexOp -> getValue()));
+					objectHeap -> storeArrayOp(refOp, indexOp, valueOp);
+					frame -> movePc(1);					
+					break;
+				}
 			case 0x50:
 				DEBUG_MSG("executing: lastore");
+
+
 				break;
 			case 0x51:
 				DEBUG_MSG("executing: fastore");
@@ -305,6 +338,8 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			case 0x59:
 				DEBUG_MSG("executing: dup");
+				frame -> opStack.push(frame -> opStack.top());
+				frame -> movePc(1);
 				break;
 			//case 0x5a:
 				//TODO dup_x1
@@ -648,6 +683,7 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			case 0xb1:
 				DEBUG_MSG("executing: return");
+				frameStack . pop();
 				return;
 				break;
 
@@ -660,19 +696,27 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			case 0xb4:
 				DEBUG_MSG("executing: getfield");
+				getField(frame);
+				frame -> movePc(3);
 				break;
 			case 0xb5:
 				DEBUG_MSG("executing: putfield");
+				putfield(frame);
+				frame -> movePc(3);
 				break;
 			case 0xb6:
 				DEBUG_MSG("executing: invokevirtual");
+				executeInvoke(frame, 0xb6);
+				frame -> movePc(3);
 				break;
 			case 0xb7:
-				DEBUG_MSG("executing: invokespecial");
+				DEBUG_MSG("executing: invokespecial");\
+				executeInvoke(frame, 0xb7);
+				frame -> movePc(3);
 				break;
 			case 0xb8:
 				DEBUG_MSG("executing: invokestatic");
-				executeInvoke(frame);
+				executeInvoke(frame, 0xb8);
 				frame -> movePc(3);
 				break;
 			case 0xb9:
@@ -684,9 +728,13 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			case 0xbb:
 				DEBUG_MSG("executing: new");
+				frame -> pushOperand( new RefOperand(executeNew(frame)));
+				frame -> movePc(3);
 				break;
 			case 0xbc:
 				DEBUG_MSG("executing: newarray");
+				frame -> pushOperand(new RefOperand(executeNewArray(frame)));
+				frame -> movePc(2);
 				break;
 			case 0xbd:
 				DEBUG_MSG("executing: anewarray");
@@ -724,7 +772,7 @@ void ExecutionUnit::execute( Frame * frame)
 	frameStack.pop();
 }
 
-void ExecutionUnit::executeInvoke(Frame * frame)
+void ExecutionUnit::executeInvoke(Frame * frame, u1 type)
 {
 
 	// get reference of method to class constant pool: invokestatic, indexbyte1, indexbyte2
@@ -737,7 +785,7 @@ void ExecutionUnit::executeInvoke(Frame * frame)
 	u2 classIndex  	    = getu2(p_methodRefInfo + 1);
 	u2 nameAndTypeIndex = getu2(p_methodRefInfo + 3);
 
-	// get class on this classIndex
+	// get class info on this classIndex
 	u1 * p_classInfo = (u1*)frame -> javaClass -> constant_pool[classIndex];
 
 	// get name_index of this class (ref to constant_pool with class name)
@@ -766,7 +814,10 @@ void ExecutionUnit::executeInvoke(Frame * frame)
 
 	u2 numberOfparams = getNumberOfMethodParams(methodDescription);
 
-	for (int i = numberOfparams - 1; i >= 0; i--)
+	if( type == 0xb8)
+		numberOfparams--;
+
+	for (int i = numberOfparams; i >= 0; i--)
 	{
 		invokedFrame -> storeOperand( i, frame -> topPopOperand());
 	}
@@ -774,6 +825,29 @@ void ExecutionUnit::executeInvoke(Frame * frame)
 	frameStack.push(invokedFrame);
 
 	execute(invokedFrame);
+}
+
+int ExecutionUnit::executeNew(Frame * frame)
+{
+	u2 constPoolClassRef = getu2(&frame -> getMethod() . code_attr -> code[frame -> getPc() + 1]);
+
+	u1 * p_classInfo = (u1*) frame -> javaClass -> constant_pool[constPoolClassRef];
+
+	u2 classNameIndex = getu2(p_classInfo + 1);
+
+	std::string className;
+	frame -> javaClass -> getAttrName(classNameIndex, className);
+
+	return objectHeap -> createObject(className);	
+}
+
+int ExecutionUnit::executeNewArray(Frame * frame)
+{
+	char arrayType = getu1(&frame -> getMethod() . code_attr -> code[frame -> getPc() + 1]);
+	
+	int length = frame -> topPopOperand() -> getValue();
+
+	return objectHeap -> createArray(length, arrayType);	
 }
 
 u2 ExecutionUnit::getNumberOfMethodParams(std::string p_description)
@@ -797,4 +871,63 @@ u2 ExecutionUnit::getNumberOfMethodParams(std::string p_description)
 		count++;
 	}
 	return count;
+}
+
+void ExecutionUnit::putfield(Frame * frame)
+{
+	u2 fieldref = getu2(&frame -> getMethod() . code_attr -> code[frame -> getPc() + 1]);
+
+	// get constant_pool entry on this reference. Its CONSTANT_Fieldref_info structure
+	u1 * p_fieldRefInfo = (u1*)frame -> javaClass -> constant_pool[fieldref];
+
+	// get info from this constant_pool entry about method
+	u2 nameAndTypeIndex = getu2(p_fieldRefInfo + 3);
+
+	// get class info on this classIndex
+	u1 * p_fieldInfo = (u1*)frame -> javaClass -> constant_pool[nameAndTypeIndex];
+
+	// get name_index of this class (ref to constant_pool with class name)
+	u2 fieldNameIndex = getu2(p_fieldInfo + 1);
+
+	// get string name of this class from constant pool
+	std::string fieldName;
+	frame -> javaClass -> getAttrName(fieldNameIndex, fieldName);
+
+	
+	Operand * valueOp = frame -> topPopOperand();
+
+	Operand * refOp = frame -> topPopOperand();
+
+	DEBUG_MSG("Setting value of " + fieldName + " to: " + std::to_string(valueOp -> getValue()));
+
+	objectHeap -> setObjectValue(refOp, fieldName, valueOp);
+}
+
+void ExecutionUnit::getField(Frame * frame)
+{
+	u2 fieldref = getu2(&frame -> getMethod() . code_attr -> code[frame -> getPc() + 1]);
+
+	// get constant_pool entry on this reference. Its CONSTANT_Fieldref_info structure
+	u1 * p_fieldRefInfo = (u1*)frame -> javaClass -> constant_pool[fieldref];
+
+	// get info from this constant_pool entry about method
+	u2 nameAndTypeIndex = getu2(p_fieldRefInfo + 3);
+
+	// get class info on this classIndex
+	u1 * p_fieldInfo = (u1*)frame -> javaClass -> constant_pool[nameAndTypeIndex];
+
+	// get name_index of this class (ref to constant_pool with class name)
+	u2 fieldNameIndex = getu2(p_fieldInfo + 1);
+
+	// get string name of this class from constant pool
+	std::string fieldName;
+	frame -> javaClass -> getAttrName(fieldNameIndex, fieldName);
+
+	Operand * refOp = frame -> topPopOperand();
+
+	Operand * valueOp = objectHeap -> getObjectValue(refOp, fieldName);
+
+	DEBUG_MSG("Getting value of " + fieldName + ". Value: " + std::to_string(valueOp -> getValue()));
+	
+	frame -> pushOperand(valueOp);
 }

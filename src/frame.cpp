@@ -10,8 +10,9 @@
 {
 
 	classHeap = p_classHeap;
-	javaClass = classHeap -> getClass(p_className + ".class");
+	javaClass = classHeap -> getClass(p_className);
 	method    = javaClass -> getMethod(p_methodName, p_methodDescription);
+	javaClass = javaClass -> setClassByMethod(p_methodName, p_methodDescription);
 	stackFrame = p_stackFrame;
 	localVariables.reserve(method . code_attr -> max_locals);
 	pc = 0;
