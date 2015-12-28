@@ -36,7 +36,7 @@ public class SatStringInput {
             int moduloAdd0 = 0;
             int partResult;
             int nextResult;
-            if(formula.charAt(0) == '(') {
+            if(prevResult == -1 && formula.charAt(i) == '(') {
                 i = getIndexOfClosingBracket(formula, 1);
                 partResult = solve(formula.substring(1, i), combination);
             } else {

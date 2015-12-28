@@ -55,7 +55,7 @@ public class SatDoubleIntInput {
         //int elementsCount = 2;
         //int[] formula = {0,-2,-3,0,-2,1};
         int elementsCount = 4;
-        int[][] formula = {{-3, 0, -2, 1}, {-1}, {-3}, {2, -2, -3, 3}};
+        int[][] formula = {{-3, 0, -2, 1}, {-1}, {2, -2, -3, 3, -2, 0}, {-1}, {1, -2, 2}};
         //int elementsCount = 2;
         //int[] formula = {-3, 0,-1,0,-2,1};
         int prevResult = -1;
@@ -71,7 +71,7 @@ public class SatDoubleIntInput {
                 int moduloAdd = 0;
                 int partResult;
                 int nextResult;
-                if(formula[i].length > 1) {
+                if(prevResult == -1 && formula[i].length > 1) {
                     partResult = solve(formula[i], combination);
                 } else {
                     if (prevResult == -1) {
@@ -103,7 +103,7 @@ public class SatDoubleIntInput {
                 i += moduloAdd;
             }
             if(prevResult == 1) {
-                //System.out.println("----> SAT splnitelny pro " + Integer.toBinaryString(combination));
+                System.out.println("----> SAT splnitelny pro " + Integer.toBinaryString(combination));
                 isTrue = 1;
             }
         }
