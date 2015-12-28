@@ -103,7 +103,7 @@ public class SatDoubleIntInput {
                 i += moduloAdd;
             }
             if(prevResult == 1) {
-                System.out.println("----> SAT splnitelny pro " + Integer.toBinaryString(combination));
+                //System.out.println("----> SAT splnitelny pro " + Integer.toBinaryString(combination));
                 isTrue = 1;
             }
         }
