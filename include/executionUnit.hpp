@@ -20,6 +20,8 @@ class ExecutionUnit{
 		u2	 getNumberOfMethodParams(std::string p_description);
 		void putfield(Frame * frame);
 		void getField(Frame * frame);
+		int  loadConstant(Frame * frame);
+		void executeNativeMethod(Frame * frame);
 
 
 };

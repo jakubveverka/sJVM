@@ -1,4 +1,6 @@
-class SubNumbers
+package test;
+
+public class SubNumbers
 {
 	public static void main(String argc[])
 	{

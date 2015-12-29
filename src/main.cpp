@@ -22,6 +22,8 @@ int main(int argc, char * argv[]){
 	ObjectHeap * objectHeap = new ObjectHeap(classHeap, objectTable);
 
 	classHeap -> getClass("test/java/lang/Object");
+	classHeap -> getClass("test/java/lang/String");
+	classHeap -> getClass("test/java/io/PrintStream");
 
 	Frame * initFrame = new Frame("main","([Ljava/lang/String;)V", argv[1], stackFrame, classHeap);
 	stackFrame.push(initFrame);

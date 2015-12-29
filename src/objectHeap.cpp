@@ -5,6 +5,7 @@
 #include "../include/classHeap.hpp"
 #include "../include/operands/operand.hpp"
 #include "../include/operands/intOperand.hpp"
+#include "../include/operands/stringOperand.hpp"
 #include "../include/objectTable.hpp"
 
 	ObjectHeap::ObjectHeap(ClassHeap * pClassHeap, ObjectTable * pObjectTable) : classHeap(pClassHeap), objectTable(pObjectTable)
@@ -78,7 +79,7 @@ void ObjectHeap::setObjectValue(Operand * refOp, std::string fieldName, Operand 
 {
 	ClassFile * javaClass = objectTable -> getClassRef(refOp -> getValue());
 
-	int fieldIndex = 0; // = size of superclass
+	int fieldIndex = 0;
 	
 	fieldIndex += javaClass -> getFieldIndex(fieldName);
 
@@ -102,4 +103,15 @@ Operand * ObjectHeap::loadArrayOp(Operand * refOp, Operand * indexOp)
 void	  ObjectHeap::storeArrayOp(Operand * refOp, Operand * indexOp, Operand * value)
 {
 	data[objectTable -> getHeapIndex(refOp -> getValue()) + indexOp -> getValue()] = value;
+}
+
+int	 	  ObjectHeap::createString(std::string stringValue)
+{
+	ClassFile * javaClass = classHeap -> getClass("java/lang/String");
+	
+	int freeSpaceIndex = getFreeSpace(1);
+
+	data[freeSpaceIndex] = new StringOperand(stringValue);
+
+	return objectTable -> addHeapObjectRef(freeSpaceIndex, javaClass);
 }

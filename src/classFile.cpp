@@ -201,13 +201,14 @@ int ClassFile::loadMethods(char * &p)
 	methods = new method_info_w_code[methods_count];
 	for (int i = 0; i < methods_count; i++)
 	{
-		methods[i] . access_flags 			= getu2(p); 	p += 2;
+			methods[i] . access_flags 			= getu2(p); 	p += 2;
 	    methods[i] . name_index 				= getu2(p); 	p += 2;
 	    methods[i] . descriptor_index 	= getu2(p); 	p += 2;
 	    methods[i] . attributes_count 	= getu2(p); 	p += 2;
 	    if(methods[i] . attributes_count > 0)
 	    {
 	    	//methods[i] . attributes = new attribute_info[methods[i] . attributes_count];
+	    	methods[i] . code_attr = NULL;
 	    	for (int j = 0; j < methods[i] . attributes_count; j++)
 	    	{
 	    		/* methods[i] . attributes[j] . */ u2 attribute_name_index = getu2(p); p += 2;
@@ -222,14 +223,15 @@ int ClassFile::loadMethods(char * &p)
 	    		}
 	    		*/
 	    		//if Attribute is "Code, save it to code_attr"
+		    	methods[i] . code_attr = new Code_attribute;
+		    	
 		    	std::string attr_value;
 		    	getAttrName( /*methods[i] . attributes[j] . */ attribute_name_index, attr_value);
 		    	if(attr_value.compare("Code") == 0){
 		    		char * pA = p;//(char *)methods[i] . attributes[j] . info;
 
-		    		methods[i] . code_attr = new Code_attribute;
 
-	    		    methods[i] . code_attr -> attribute_name_index 		= /* methods[i] . attributes[j] .*/ attribute_name_index;
+	    		  methods[i] . code_attr -> attribute_name_index 		= /* methods[i] . attributes[j] .*/ attribute_name_index;
 				    methods[i] . code_attr -> attribute_length			= /* methods[i] . attributes[j] .*/ attribute_length;
 				    methods[i] . code_attr -> max_stack					= getu2(pA); pA += 2;
 				    methods[i] . code_attr -> max_locals				= getu2(pA); pA += 2;
@@ -398,7 +400,6 @@ int ClassFile::getFieldIndex(std::string fieldName)
 		getAttrName(fields[i] . name_index, fielNamePool);
 		if(fieldName.compare(fielNamePool) == 0)
 		{
-			std::cout << "IIIIIIIIII - " << i + fieldIndex << std::endl;
 			return i + fieldIndex;
 		}
 	}
@@ -407,7 +408,5 @@ int ClassFile::getFieldIndex(std::string fieldName)
 		std::string className = getClassNameFromRef(super_class);
 		fieldIndex = classHeap -> getClass(className) -> getFieldIndex(fieldName);
 	}
-	if(fieldIndex == -1)
-		std::cout << "FAAAAAAAAAAAAAAAAAAAIL" << std::endl;
 	return fieldIndex;
 }

@@ -2,12 +2,13 @@ package test;
 
 import test.ClassA;
 import test.ClassB;
+import test.ClassC;
 
 class CreateObject{
 
 	public static void main(String argc[]){
 
-		ClassB obj2 = new ClassB(3, 4);
+		ClassC obj2 = new ClassC();
 
 		/*
 		int x = obj2 . x;
@@ -16,6 +17,6 @@ class CreateObject{
 		int b = obj2 . b;
 		int sumB = obj2 . sumB();
 		*/
-		int sumA = obj2 . sumA();	
+		//int sumA = obj2 . sumA();	
 	}
 }

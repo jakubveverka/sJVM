@@ -9,6 +9,8 @@
 #include "../include/operands/refOperand.hpp"
 #include "../include/objectHeap.hpp"
 
+#include "../include/nativeMethods.hpp"
+
 	 ExecutionUnit::ExecutionUnit(std::stack<Frame*> p_frameStack, ObjectHeap * p_objectHeap)
 {
 	frameStack = p_frameStack;
@@ -17,6 +19,12 @@
 
 void ExecutionUnit::execute( Frame * frame)
 {
+
+	if(frame -> getMethod() . access_flags & ACC_NATIVE )
+	{
+		executeNativeMethod(frame);
+		return;
+	}
 
 	u1 *p = frame -> getMethod() . code_attr -> code;
 
@@ -92,8 +100,13 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			}
 			case 0x12:
-				DEBUG_MSG("executing: LDC");
+			{
+				Operand * valueOp = new RefOperand( loadConstant(frame));
+				DEBUG_MSG("executing: ldc, index: " + std::to_string(valueOp -> getValue()));
+				frame -> pushOperand(valueOp);
+				frame -> movePc(2);
 				break;
+			}
 			//case 0x13:
 				//TODO ldc_w
 			case 0x14:
@@ -178,12 +191,12 @@ void ExecutionUnit::execute( Frame * frame)
 				{
 					Operand * indexOp = frame -> topPopOperand();
 					Operand * refOp = frame -> topPopOperand();
-					Operand * valueOp = objectHeap -> loadArrayOp(refOp, indexOp);	
-					DEBUG_MSG("executing: iaload. Loaded value: " + std::to_string(valueOp -> getValue()) + 
+					Operand * valueOp = objectHeap -> loadArrayOp(refOp, indexOp);
+					DEBUG_MSG("executing: iaload. Loaded value: " + std::to_string(valueOp -> getValue()) +
 							  " from ref: " + std::to_string(refOp -> getValue()) +
 							  " on index: " + std::to_string(indexOp -> getValue()));
 					frame -> pushOperand(valueOp);
-					frame -> movePc(1);				
+					frame -> movePc(1);
 					break;
 				}
 			case 0x2f:
@@ -299,11 +312,11 @@ void ExecutionUnit::execute( Frame * frame)
 					Operand * valueOp = frame -> topPopOperand();
 					Operand * indexOp = frame -> topPopOperand();
 					Operand * refOp = frame -> topPopOperand();
-					DEBUG_MSG("executing: iastore. Storing value: " + std::to_string(valueOp -> getValue()) + 
+					DEBUG_MSG("executing: iastore. Storing value: " + std::to_string(valueOp -> getValue()) +
 							  " from ref: " + std::to_string(refOp -> getValue()) +
 							  " on index: " + std::to_string(indexOp -> getValue()));
 					objectHeap -> storeArrayOp(refOp, indexOp, valueOp);
-					frame -> movePc(1);					
+					frame -> movePc(1);
 					break;
 				}
 			case 0x50:
@@ -690,6 +703,7 @@ void ExecutionUnit::execute( Frame * frame)
 			// REFERENCIS //////////////////////////////////////////////////////////
 			case 0xb2:
 				DEBUG_MSG("executing: getstatic");
+				frame -> movePc(3);
 				break;
 			case 0xb3:
 				DEBUG_MSG("executing: putstatic");
@@ -738,6 +752,8 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			case 0xbd:
 				DEBUG_MSG("executing: anewarray");
+				frame -> pushOperand(new RefOperand(executeANewArray(frame)));
+				frame -> movePc(3);
 				break;
 			case 0xbe:
 				DEBUG_MSG("executing: arraylength");
@@ -810,12 +826,14 @@ void ExecutionUnit::executeInvoke(Frame * frame, u1 type)
 	frame -> javaClass -> getAttrName(nameIndexMethod, methodName);
 	frame -> javaClass -> getAttrName(descriptorIndex, methodDescription);
 
-	Frame * invokedFrame = new Frame(methodName, methodDescription, className, frame -> stackFrame, frame -> classHeap);
-
 	u2 numberOfparams = getNumberOfMethodParams(methodDescription);
 
-	if( type == 0xb8)
+	Frame * invokedFrame = new Frame(methodName, methodDescription, className, frame -> stackFrame, frame -> classHeap);
+
+
+	if( type == 0xb8 or invokedFrame -> getMethod() . access_flags & ACC_NATIVE)
 		numberOfparams--;
+
 
 	for (int i = numberOfparams; i >= 0; i--)
 	{
@@ -838,16 +856,16 @@ int ExecutionUnit::executeNew(Frame * frame)
 	std::string className;
 	frame -> javaClass -> getAttrName(classNameIndex, className);
 
-	return objectHeap -> createObject(className);	
+	return objectHeap -> createObject(className);
 }
 
 int ExecutionUnit::executeNewArray(Frame * frame)
 {
 	char arrayType = getu1(&frame -> getMethod() . code_attr -> code[frame -> getPc() + 1]);
-	
+
 	int length = frame -> topPopOperand() -> getValue();
 
-	return objectHeap -> createArray(length, arrayType);	
+	return objectHeap -> createArray(length, arrayType);
 }
 
 u2 ExecutionUnit::getNumberOfMethodParams(std::string p_description)
@@ -893,7 +911,7 @@ void ExecutionUnit::putfield(Frame * frame)
 	std::string fieldName;
 	frame -> javaClass -> getAttrName(fieldNameIndex, fieldName);
 
-	
+
 	Operand * valueOp = frame -> topPopOperand();
 
 	Operand * refOp = frame -> topPopOperand();
@@ -928,6 +946,43 @@ void ExecutionUnit::getField(Frame * frame)
 	Operand * valueOp = objectHeap -> getObjectValue(refOp, fieldName);
 
 	DEBUG_MSG("Getting value of " + fieldName + ". Value: " + std::to_string(valueOp -> getValue()));
-	
+
 	frame -> pushOperand(valueOp);
+}
+
+int ExecutionUnit::loadConstant(Frame * frame)
+{
+	u1 constPoolIndex = getu1(&frame -> getMethod() . code_attr -> code[frame -> getPc() + 1]);
+
+	u1 * constPoolInfo = (u1*)frame -> javaClass -> constant_pool[constPoolIndex];
+
+	switch(constPoolInfo[0])
+	{
+		case CONSTANT_Integer:
+
+			break;
+		case CONSTANT_Float:
+
+			break;
+		case CONSTANT_String:
+			u2 constPoolUtfIndex = getu2(constPoolInfo + 1);
+			std::string stringValue;
+			frame -> javaClass -> getAttrName(constPoolUtfIndex, stringValue);
+			return objectHeap -> createString(stringValue);
+			break;
+	}
+	return -1;
+}
+
+void ExecutionUnit::executeNativeMethod(Frame * frame)
+{
+	std::string className, methodName, methodDescription;
+	className = frame -> javaClass -> getName();
+	frame -> javaClass -> getAttrName(frame -> getMethod() . name_index, methodName);
+    frame -> javaClass -> getAttrName(frame -> getMethod() . descriptor_index, methodDescription);
+
+    std::string methodSig = className + "." + methodName + ":" + methodDescription;
+
+    if(methodSig.compare("java/io/PrintStream.print:(Ljava/lang/String;)V") == 0)
+    	void_PrintStream_Print_String(frame, objectHeap);
 }

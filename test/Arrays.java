@@ -9,6 +9,8 @@ class Arrays{
 		pole[0][0] = 1;
 
 		int a = pole[0][0];
+
+		int[][] formula = {{-3}, {0},{-1},{0},{-2},{1}};
 	}
 
 	
