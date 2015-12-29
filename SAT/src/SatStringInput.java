@@ -36,7 +36,7 @@ public class SatStringInput {
             int moduloAdd0 = 0;
             int partResult;
             int nextResult;
-            if(formula.charAt(0) == '(') {
+            if(prevResult == -1 && formula.charAt(i) == '(') {
                 i = getIndexOfClosingBracket(formula, 1);
                 partResult = solve(formula.substring(1, i), combination);
             } else {
@@ -74,8 +74,9 @@ public class SatStringInput {
     }
 
     public static void main(String[] args) throws IOException {
-        int isTrue = 0;
         int elementsCount;
+        int result;
+        int isTrue = 0;
 
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         Scanner inputFile;
@@ -106,7 +107,7 @@ public class SatStringInput {
 
         for(int combination = 0; combination < countOfPossibleCombinations; combination++) {
             System.out.println("Testing combination " + Integer.toBinaryString(combination));
-            int result = solve(formula, combination);
+            result = solve(formula, combination);
             if(result == 1) {
                 System.out.println("----> SAT splnitelny pro " + Integer.toBinaryString(combination));
                 outputFile.write("SAT splnitelny pro " + Integer.toBinaryString(combination) + "\n");
