@@ -22,6 +22,7 @@ class ObjectHeap{
 		int		  createArray(int length, char arrayType);
 		int	 	  createString(std::string stringValue);
 		int  	  getFreeSpace(int objectSize);
+		Operand * getArrayLength(Operand * refOp);
 		void 	  setObjectValue(Operand * refOp, std::string fieldName, Operand * valueOp);
 		Operand * getObjectValue(Operand * refOp, std::string fieldName);
 		Operand * loadArrayOp(Operand * refOp, Operand * indexOp);					

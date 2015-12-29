@@ -35,9 +35,10 @@ int ObjectHeap::createObject(std::string className)
 
 int	ObjectHeap::createArray(int length, char arrayType)
 {
-	int freeSpaceIndex = getFreeSpace(length);
+	int freeSpaceIndex = getFreeSpace(length + 1);
 
-	for (int i = freeSpaceIndex; i < freeSpaceIndex + length; i++)
+	data[freeSpaceIndex] = new IntOperand(length);
+	for (int i = freeSpaceIndex + 1; i < freeSpaceIndex + length + 1; i++)
 	{
 		switch(arrayType){
 			case 10:  // int
@@ -95,14 +96,19 @@ Operand * ObjectHeap::getObjectValue(Operand * refOp, std::string fieldName)
 	return data[objectTable -> getHeapIndex(refOp -> getValue()) + fieldIndex];
 }
 
+Operand * ObjectHeap::getArrayLength(Operand * refOp)
+{
+	return data[objectTable -> getHeapIndex(refOp -> getValue())];
+}
+
 Operand * ObjectHeap::loadArrayOp(Operand * refOp, Operand * indexOp)
 {
-	return data[objectTable -> getHeapIndex(refOp -> getValue()) + indexOp -> getValue()];
+	return data[objectTable -> getHeapIndex(refOp -> getValue()) + indexOp -> getValue() + 1];
 }
 
 void	  ObjectHeap::storeArrayOp(Operand * refOp, Operand * indexOp, Operand * value)
 {
-	data[objectTable -> getHeapIndex(refOp -> getValue()) + indexOp -> getValue()] = value;
+	data[objectTable -> getHeapIndex(refOp -> getValue()) + indexOp -> getValue() + 1] = value;
 }
 
 int	 	  ObjectHeap::createString(std::string stringValue)

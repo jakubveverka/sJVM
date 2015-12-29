@@ -752,11 +752,13 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			case 0xbd:
 				DEBUG_MSG("executing: anewarray");
-				frame -> pushOperand(new RefOperand(executeANewArray(frame)));
+				//frame -> pushOperand(new RefOperand(executeANewArray(frame)));
 				frame -> movePc(3);
 				break;
 			case 0xbe:
 				DEBUG_MSG("executing: arraylength");
+				frame -> pushOperand(objectHeap -> getArrayLength(frame -> topPopOperand()));
+				frame -> movePc(1);
 				break;
 			case 0xbf:
 				DEBUG_MSG("executing: athrow");

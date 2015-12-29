@@ -1,3 +1,4 @@
+package SAT.src;
 
 public class SatIntInput {
 
