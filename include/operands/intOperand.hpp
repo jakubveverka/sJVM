@@ -10,6 +10,7 @@ class IntOperand : public Operand {
 				IntOperand(int val);
 		int 	getValue() const;
 		void 	setValue(int val);
+		Operand* clone();
 			  	~IntOperand();
 };
 

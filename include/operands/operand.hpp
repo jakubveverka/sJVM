@@ -11,6 +11,7 @@ class Operand{
 		virtual void setValue(int val);
 		virtual std::string getStringValue() const;
 		virtual void setStringValue(std::string val);
+		virtual Operand* clone();
 		virtual ~Operand() {}
 };
 

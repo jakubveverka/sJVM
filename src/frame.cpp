@@ -70,3 +70,7 @@ void Frame::printOpStack()
 	DEBUG_MSG("end of printing");
 }
 
+std::stack<Operand*>* Frame::getOpStack()
+{
+	return &opStack;
+}

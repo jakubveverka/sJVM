@@ -32,6 +32,7 @@ class Frame{
 		Operand			 * loadOperand(int index);
 		Operand			 * topPopOperand();
 		void 				printOpStack();
+		std::stack<Operand*>* getOpStack();
 };
 
 #endif /* FRAME_HPP_ */

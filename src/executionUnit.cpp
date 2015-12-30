@@ -916,6 +916,8 @@ void ExecutionUnit::putfield(Frame * frame)
 
 	Operand * valueOp = frame -> topPopOperand();
 
+	valueOp = valueOp->clone();
+
 	Operand * refOp = frame -> topPopOperand();
 
 	DEBUG_MSG("Setting value of " + fieldName + " to: " + std::to_string(valueOp -> getValue()));
@@ -946,6 +948,8 @@ void ExecutionUnit::getField(Frame * frame)
 	Operand * refOp = frame -> topPopOperand();
 
 	Operand * valueOp = objectHeap -> getObjectValue(refOp, fieldName);
+
+	valueOp = valueOp->clone();
 
 	DEBUG_MSG("Getting value of " + fieldName + ". Value: " + std::to_string(valueOp -> getValue()));
 

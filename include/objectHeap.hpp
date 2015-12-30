@@ -2,10 +2,12 @@
 #define OBJECTHEAP_HPP_
 
 #include <string>
+#include <cstdlib>
 
 class ClassHeap;
 class Operand;
 class ObjectTable;
+class GarbageCollector;
 
 class ObjectHeap{
 	private:
@@ -15,6 +17,7 @@ class ObjectHeap{
 		int    	      heapSize = 1000;
 		ClassHeap   * classHeap;
 		ObjectTable * objectTable;
+		GarbageCollector * garbageCollector = NULL;
 
 	public:
 			 	  ObjectHeap(ClassHeap * pClassHeap, ObjectTable * objectTable);
@@ -25,8 +28,10 @@ class ObjectHeap{
 		Operand * getArrayLength(Operand * refOp);
 		void 	  setObjectValue(Operand * refOp, std::string fieldName, Operand * valueOp);
 		Operand * getObjectValue(Operand * refOp, std::string fieldName);
-		Operand * loadArrayOp(Operand * refOp, Operand * indexOp);					
-		void	  storeArrayOp(Operand * refOp, Operand * indexOp, Operand * valueOp);					
+		Operand * loadArrayOp(Operand * refOp, Operand * indexOp);
+		void	  storeArrayOp(Operand * refOp, Operand * indexOp, Operand * valueOp);
+		void    setGarbageCollector(GarbageCollector* pGarbageCollector);
+		void 	  print();
 
 };
 

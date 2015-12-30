@@ -3,12 +3,14 @@
 
 class Ref{
 	private:
-
-	public:		
+		int gcNumber = 0;
+	public:
 		int heapIndex;
 	public:
-		Ref(int p_index);	
-	virtual int getIndex() const = 0;	
+		Ref(int p_index);
+	virtual int getIndex() const = 0;
+	void setGcNumber(int pGcNumber);
+	int  getGcNumber();
 };
 
 #endif /* REF_HPP */

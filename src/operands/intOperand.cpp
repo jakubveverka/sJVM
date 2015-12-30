@@ -19,3 +19,9 @@ void IntOperand::setValue(int val)
 {
 	value = val;
 }
+
+Operand* IntOperand::clone()
+{
+	Operand* clonedOperand = new IntOperand(value);
+	return clonedOperand;
+}
