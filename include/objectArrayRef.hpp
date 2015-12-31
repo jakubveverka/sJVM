@@ -11,7 +11,6 @@ class ObjectArrayRef : public Ref{
 		std::string className;
 	public:
 		ObjectArrayRef(int p_index, std::string p_className);
-		int getIndex() const;
 };
 
 #endif /* OBJECTARRAYREF_HPP_ */

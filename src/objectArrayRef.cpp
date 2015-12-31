@@ -5,10 +5,3 @@ ObjectArrayRef::ObjectArrayRef(int p_index, std::string p_className) : Ref(p_ind
 {
 
 }
-
-int ObjectArrayRef::getIndex() const
-{
-	return heapIndex;
-}
-
-

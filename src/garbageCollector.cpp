@@ -8,6 +8,7 @@
 #include "../include/debugMsg.hpp"
 #include "../include/objectRef.hpp"
 #include "../include/arrayRef.hpp"
+#include "../include/objectArrayRef.hpp"
 #include "../include/operands/IntOperand.hpp"
 
       GarbageCollector::GarbageCollector(ObjectHeap* p_objectHeap, ObjectTable* p_objectTable, std::stack<Frame*>* p_stackFrame)
@@ -90,8 +91,8 @@ void GarbageCollector::findInsideObject(Ref* ref, RefOperand* refOperand)
             }
          }
       }
-   } else if(dynamic_cast<ArrayRef*>(ref)) {
-      DEBUG_MSG("findInsideObject arrayref");
+   } else if(dynamic_cast<ObjectArrayRef*>(ref)) {
+      DEBUG_MSG("findInsideObject objectarrayref");
       int arrayLength = objectHeap->getArrayLength(refOperand)->getValue();
       for(int i = 0; i < arrayLength; i++) {
          DEBUG_MSG("findInsideObject array fields");
@@ -99,7 +100,7 @@ void GarbageCollector::findInsideObject(Ref* ref, RefOperand* refOperand)
          Operand* arrayOperand = objectHeap->loadArrayOp(refOperand, indexOperand);
          delete indexOperand;
          if(RefOperand* o = dynamic_cast<RefOperand*>(arrayOperand)) {
-            DEBUG_MSG("findInsideObject array refoperand");
+            DEBUG_MSG("findInsideObject object array refoperand");
             Ref* objectRef = objectTable->getRef(o->getValue()); //or array ref
             if(objectRef != nullptr && objectRef->getGcNumber() != numberOfRuns) {
                objectRef->setGcNumber(numberOfRuns);
@@ -108,9 +109,8 @@ void GarbageCollector::findInsideObject(Ref* ref, RefOperand* refOperand)
             }
          }
       }
-   } else {
-      DEBUG_MSG("ERROR: Unknown ref type to object table");
    }
+
    DEBUG_MSG("endfind inside object");
 }
 
@@ -132,9 +132,9 @@ void GarbageCollector::cleanHeap()
                delete heapOperand;
                objectHeap->data[heapIndex] = nullptr;
             }
-         } else if(ArrayRef* aref = dynamic_cast<ArrayRef*>(ref)) {
+         } else if((dynamic_cast<ObjectArrayRef*>(ref)) || (dynamic_cast<ArrayRef*>(ref))) {
             int arrayLength = objectHeap->getArrayLength(refOperand)->getValue();
-            DEBUG_MSG("Removing array with index " + std::to_string(i) + " in object table and with heapIndex " + std::to_string(aref->heapIndex) + " with lenght " + std::to_string(arrayLength));
+            DEBUG_MSG("Removing array with index " + std::to_string(i) + " in object table and with heapIndex " + std::to_string(ref->heapIndex) + " with lenght " + std::to_string(arrayLength));
             for(int j = 0; j < arrayLength; j++) {
                IntOperand* indexOperand = new IntOperand(j);
                Operand* arrayOperand = objectHeap->loadArrayOp(refOperand, indexOperand);
@@ -144,7 +144,7 @@ void GarbageCollector::cleanHeap()
                objectHeap->data[heapIndex] = nullptr;
             }
             //removing array length operand on the heap
-            Operand* lengthOperand = objectHeap->data[aref->heapIndex];
+            Operand* lengthOperand = objectHeap->data[ref->heapIndex];
             delete lengthOperand;
             objectHeap->data[ref->heapIndex] = nullptr;
          } else {
