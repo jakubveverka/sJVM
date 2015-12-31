@@ -5,8 +5,3 @@
 {
 
 }
-
-int ArrayRef::getIndex() const
-{
-	return heapIndex;
-}

@@ -32,7 +32,7 @@ typedef struct Code_attribute {
     Exception_table * exception_table; //[exception_table_length];
     u2 attributes_count;
     attribute_info * attributes; //[attributes_count];
-} Code_attribute; 
+} Code_attribute;
 
 /*
  * types for classfile structure
@@ -111,7 +111,7 @@ class ClassFile {
 		int loadInterfaces(char * &p);
 		int loadFields(char * &p);
 		int loadMethods(char * &p);
-		int loadAttributes(char * &p);		
+		int loadAttributes(char * &p);
 };
 
 #endif /* CLASSFILE_HPP_ */

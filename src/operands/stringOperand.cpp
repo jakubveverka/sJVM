@@ -4,7 +4,7 @@
 		StringOperand::StringOperand(std::string val) : value(val)
 {
 
-}	
+}
 
 std::string	StringOperand::getStringValue() const
 {
@@ -16,7 +16,13 @@ void 	StringOperand::setStringValue(std::string val)
 	value = val;
 }
 
+Operand* StringOperand::clone()
+{
+	Operand* clonedOperand = new StringOperand(value);
+	return clonedOperand;
+}
+
 	  	StringOperand::~StringOperand()
 {
 
-}	
+}

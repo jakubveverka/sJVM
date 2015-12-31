@@ -7,7 +7,9 @@
 #include "../include/operands/intOperand.hpp"
 #include "../include/operands/refOperand.hpp"
 #include "../include/operands/stringOperand.hpp"
+#include "../include/operands/refOperand.hpp"
 #include "../include/objectTable.hpp"
+#include "../include/garbageCollector.hpp"
 
 	ObjectHeap::ObjectHeap(ClassHeap * pClassHeap, ObjectTable * pObjectTable) : classHeap(pClassHeap), objectTable(pObjectTable)
 {
@@ -32,6 +34,7 @@ int ObjectHeap::createObject(std::string className)
 	}
 
 	return objectTable -> addHeapObjectRef(freeSpaceIndex, javaClass);
+
 }
 
 int	ObjectHeap::createArray(int length, char arrayType)
@@ -66,27 +69,38 @@ int ObjectHeap::createObjectArray(int length,std::string className)
 	return objectTable -> addHeapObjectArrayRef(freeSpaceIndex, className);
 }
 
-
 int ObjectHeap::getFreeSpace(int objectSize)
 {
-	int i = 0;
-	while(1){
-		while(data[i] != nullptr){
-			i++;
-			if(i > heapSize - 1)
-				return -1;
+	for(int j = 0; j < 2; j++) {
+		int i = 0;
+		int result = -2;
+		while(1){
+			while(data[i] != nullptr){
+				i++;
+				if(i > heapSize - 1) {
+					result = -1;
+					break;
+				}
+			}
+			if(result == -1) break;
+			bool free = true;
+			for (int j = 0; j < objectSize; j++)
+			{
+				if(i + j > heapSize - 1) {
+					result = -1;
+					break;
+				}
+				if(data[i + j] != nullptr)
+					free = false;
+			}
+			if(result == -1) break;
+			if(free)
+				return i;
 		}
-		bool free = true;
-		for (int j = 0; j < objectSize; j++)
-		{
-			if(i + j > heapSize - 1)
-				return -1;
-			if(data[i + j] != nullptr)
-				free = false;
-		}
-		if(free)
-			return i;
+		if( j == 0 && result == -1 && garbageCollector != NULL) garbageCollector->execute();
+		else throw 21;
 	}
+	throw 21;
 }
 
 void ObjectHeap::setObjectValue(Operand * refOp, std::string fieldName, Operand * valueOp)
@@ -102,11 +116,9 @@ void ObjectHeap::setObjectValue(Operand * refOp, std::string fieldName, Operand 
 
 Operand * ObjectHeap::getObjectValue(Operand * refOp, std::string fieldName)
 {
-	ClassFile * javaClass = objectTable -> getClassRef(refOp -> getValue());
+	int index = getFieldHeapIndex(refOp, fieldName);
 
-	int fieldIndex = javaClass -> getFieldIndex(fieldName);
-
-	return data[objectTable -> getHeapIndex(refOp -> getValue()) + fieldIndex];
+	return data[index];
 }
 
 Operand * ObjectHeap::getArrayLength(Operand * refOp)
@@ -116,7 +128,8 @@ Operand * ObjectHeap::getArrayLength(Operand * refOp)
 
 Operand * ObjectHeap::loadArrayOp(Operand * refOp, Operand * indexOp)
 {
-	return data[objectTable -> getHeapIndex(refOp -> getValue()) + indexOp -> getValue() + 1];
+	int index = getArrayOpIndex(refOp, indexOp);
+	return data[index];
 }
 
 void	  ObjectHeap::storeArrayOp(Operand * refOp, Operand * indexOp, Operand * value)
@@ -133,4 +146,35 @@ int	 	  ObjectHeap::createString(std::string stringValue)
 	data[freeSpaceIndex] = new StringOperand(stringValue);
 
 	return objectTable -> addHeapObjectRef(freeSpaceIndex, javaClass);
+}
+
+void    ObjectHeap::setGarbageCollector(GarbageCollector* pGarbageCollector)
+{
+	garbageCollector = pGarbageCollector;
+}
+
+void ObjectHeap::print()
+{
+	DEBUG_MSG("Printing object heap:");
+	for(int i = 0; i < 15; i++) {
+		if(data[i] == nullptr) DEBUG_MSG(std::to_string(i) + ". position is free");
+		else if(IntOperand* o = dynamic_cast<IntOperand*>(data[i])) DEBUG_MSG(std::to_string(i) + ". position is IntOperand with value " + std::to_string(o->getValue()));
+		else if(RefOperand* o = dynamic_cast<RefOperand*>(data[i])) DEBUG_MSG(std::to_string(i) + ". position is RefOperand with value " + std::to_string(o->getValue()));
+		else if(StringOperand* o = dynamic_cast<StringOperand*>(data[i])) DEBUG_MSG(std::to_string(i) + ". position is StringOperand with value " + o->getStringValue());
+		else DEBUG_MSG(std::to_string(i) + ". position unknown operand");
+	}
+	DEBUG_MSG("Finished printing object heap");
+}
+
+int ObjectHeap::getFieldHeapIndex(Operand * refOp, std::string fieldName) {
+	ClassFile * javaClass = objectTable -> getClassRef(refOp -> getValue());
+
+	int fieldIndex = javaClass -> getFieldIndex(fieldName);
+
+	return objectTable -> getHeapIndex(refOp -> getValue()) + fieldIndex;
+}
+
+int ObjectHeap::getArrayOpIndex(Operand * refOp, Operand * indexOp)
+{
+	return objectTable -> getHeapIndex(refOp -> getValue()) + indexOp -> getValue() + 1;
 }

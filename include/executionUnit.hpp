@@ -9,10 +9,10 @@ class ObjectHeap;
 
 class ExecutionUnit{
 	private:
-		std::stack<Frame*> frameStack;
+		std::stack<Frame*>* frameStack;
 		ObjectHeap       * objectHeap;
 	public:
-			 ExecutionUnit(std::stack<Frame*> p_frameStack, ObjectHeap * objectHeap);
+			 ExecutionUnit(std::stack<Frame*>* p_frameStack, ObjectHeap * objectHeap);
 		void execute(Frame *);
 		void executeInvoke(Frame *, u1 type);
 		int  executeNew(Frame *);

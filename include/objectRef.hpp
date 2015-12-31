@@ -12,8 +12,8 @@ class ObjectRef : public Ref{
 		ClassFile * classFile;
 
 	public:
-		ObjectRef(int p_index, ClassFile * p_classFile);		
-		int getIndex() const;
+		ObjectRef(int p_index, ClassFile * p_classFile);
+		~ObjectRef() {};
 };
 
 #endif /* OBJECTREF_HPP_ */
