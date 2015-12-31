@@ -14,3 +14,8 @@ void Ref::setGcNumber(int pGcNumber)
 int  Ref::getGcNumber() {
 	return gcNumber;
 }
+
+int Ref::getIndex() const
+{
+	return heapIndex;
+}

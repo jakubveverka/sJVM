@@ -6,11 +6,11 @@
 class ArrayRef : public Ref{
 	private:
 
-	public:		
+	public:
 		char arrayType;
 	public:
-		ArrayRef(int p_index, char p_arrayType);		
-		int getIndex() const;
+		ArrayRef(int p_index, char p_arrayType);
+		~ArrayRef() {};
 };
 
 #endif /* ARRAYREF_HHPP */

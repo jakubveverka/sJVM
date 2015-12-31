@@ -1,4 +1,6 @@
 
+#include <cstdlib>
+
 #include "../include/objectTable.hpp"
 #include "../include/objectRef.hpp"
 #include "../include/arrayRef.hpp"
@@ -59,7 +61,7 @@ Ref* ObjectTable::getRef(int index) {
 void ObjectTable::print()
 {
 	DEBUG_MSG("Printing object table:");
-	for(int i = 0; i < tableSize; i++) {
+	for(int i = 0; i < 10; i++) {
 		if(objectTable[i] == nullptr) DEBUG_MSG(std::to_string(i) + ". position is free");
 		else if(ObjectRef* o = dynamic_cast<ObjectRef*>(objectTable[i])) DEBUG_MSG(std::to_string(i) + ". position is ObjectRef with index " + std::to_string(o->getIndex()));
 		else if(ArrayRef* a = dynamic_cast<ArrayRef*>(objectTable[i])) DEBUG_MSG(std::to_string(i) + ". position is ArrayRef with index " + std::to_string(a->getIndex()));

@@ -32,6 +32,8 @@ class ObjectHeap{
 		void	  storeArrayOp(Operand * refOp, Operand * indexOp, Operand * valueOp);
 		void    setGarbageCollector(GarbageCollector* pGarbageCollector);
 		void 	  print();
+		int	  getFieldHeapIndex(Operand * refOp, std::string fieldName);
+		int 	  getArrayOpIndex(Operand * refOp, Operand * indexOp);
 
 };
 

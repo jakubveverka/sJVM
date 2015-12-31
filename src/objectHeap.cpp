@@ -33,6 +33,7 @@ int ObjectHeap::createObject(std::string className)
 	}
 
 	return objectTable -> addHeapObjectRef(freeSpaceIndex, javaClass);
+
 }
 
 int	ObjectHeap::createArray(int length, char arrayType)
@@ -103,11 +104,9 @@ void ObjectHeap::setObjectValue(Operand * refOp, std::string fieldName, Operand 
 
 Operand * ObjectHeap::getObjectValue(Operand * refOp, std::string fieldName)
 {
-	ClassFile * javaClass = objectTable -> getClassRef(refOp -> getValue());
+	int index = getFieldHeapIndex(refOp, fieldName);
 
-	int fieldIndex = javaClass -> getFieldIndex(fieldName);
-
-	return data[objectTable -> getHeapIndex(refOp -> getValue()) + fieldIndex];
+	return data[index];
 }
 
 Operand * ObjectHeap::getArrayLength(Operand * refOp)
@@ -117,7 +116,8 @@ Operand * ObjectHeap::getArrayLength(Operand * refOp)
 
 Operand * ObjectHeap::loadArrayOp(Operand * refOp, Operand * indexOp)
 {
-	return data[objectTable -> getHeapIndex(refOp -> getValue()) + indexOp -> getValue() + 1];
+	int index = getArrayOpIndex(refOp, indexOp);
+	return data[index];
 }
 
 void	  ObjectHeap::storeArrayOp(Operand * refOp, Operand * indexOp, Operand * value)
@@ -144,7 +144,7 @@ void    ObjectHeap::setGarbageCollector(GarbageCollector* pGarbageCollector)
 void ObjectHeap::print()
 {
 	DEBUG_MSG("Printing object heap:");
-	for(int i = 0; i < heapSize; i++) {
+	for(int i = 0; i < 15; i++) {
 		if(data[i] == nullptr) DEBUG_MSG(std::to_string(i) + ". position is free");
 		else if(IntOperand* o = dynamic_cast<IntOperand*>(data[i])) DEBUG_MSG(std::to_string(i) + ". position is IntOperand with value " + std::to_string(o->getValue()));
 		else if(RefOperand* o = dynamic_cast<RefOperand*>(data[i])) DEBUG_MSG(std::to_string(i) + ". position is RefOperand with value " + std::to_string(o->getValue()));
@@ -152,4 +152,17 @@ void ObjectHeap::print()
 		else DEBUG_MSG(std::to_string(i) + ". position unknown operand");
 	}
 	DEBUG_MSG("Finished printing object heap");
+}
+
+int ObjectHeap::getFieldHeapIndex(Operand * refOp, std::string fieldName) {
+	ClassFile * javaClass = objectTable -> getClassRef(refOp -> getValue());
+
+	int fieldIndex = javaClass -> getFieldIndex(fieldName);
+
+	return objectTable -> getHeapIndex(refOp -> getValue()) + fieldIndex;
+}
+
+int ObjectHeap::getArrayOpIndex(Operand * refOp, Operand * indexOp)
+{
+	return objectTable -> getHeapIndex(refOp -> getValue()) + indexOp -> getValue() + 1;
 }

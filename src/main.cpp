@@ -30,10 +30,10 @@ int main(int argc, char * argv[]){
 	classHeap -> getClass("test/java/lang/String");
 	classHeap -> getClass("test/java/io/PrintStream");
 
-	Frame * initFrame = new Frame("main","([Ljava/lang/String;)V", argv[1], stackFrame, classHeap);
+	Frame * initFrame = new Frame("main","([Ljava/lang/String;)V", argv[1], &stackFrame, classHeap);
 	stackFrame.push(initFrame);
 
-	ExecutionUnit * ex = new ExecutionUnit(stackFrame, objectHeap);
+	ExecutionUnit * ex = new ExecutionUnit(&stackFrame, objectHeap);
 
 	Frame * frame = stackFrame.top();
 

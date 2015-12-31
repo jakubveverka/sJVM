@@ -4,6 +4,8 @@
 #include "frame.hpp"
 #include "objectTable.hpp"
 #include "objectHeap.hpp"
+#include "ref.hpp"
+#include "operands/refOperand.hpp"
 
 class ObjectTable;
 class ObjectHeap;
@@ -21,7 +23,7 @@ class GarbageCollector {
 			 GarbageCollector(ObjectHeap* p_objectHeap, ObjectTable* p_objectTable, std::stack<Frame*>* p_stackFrame);
      void execute();
      void markLiveObjects();
-     void findInsideObject(Ref* ref);
+     void findInsideObject(Ref* ref, RefOperand* refOperand);
      void cleanHeap();
 };
 

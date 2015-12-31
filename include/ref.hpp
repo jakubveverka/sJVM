@@ -8,7 +8,8 @@ class Ref{
 		int heapIndex;
 	public:
 		Ref(int p_index);
-	virtual int getIndex() const = 0;
+	virtual ~Ref() {};
+	int getIndex() const;
 	void setGcNumber(int pGcNumber);
 	int  getGcNumber();
 };

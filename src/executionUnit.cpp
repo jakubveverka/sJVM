@@ -8,10 +8,11 @@
 #include "../include/operands/intOperand.hpp"
 #include "../include/operands/refOperand.hpp"
 #include "../include/objectHeap.hpp"
+#include "../include/garbageCollector.hpp"
 
 #include "../include/nativeMethods.hpp"
 
-	 ExecutionUnit::ExecutionUnit(std::stack<Frame*> p_frameStack, ObjectHeap * p_objectHeap)
+	 ExecutionUnit::ExecutionUnit(std::stack<Frame*>* p_frameStack, ObjectHeap * p_objectHeap)
 {
 	frameStack = p_frameStack;
 	objectHeap = p_objectHeap;
@@ -345,6 +346,8 @@ void ExecutionUnit::execute( Frame * frame)
 			// STACK ///////////////////////////////////////////////////////////////
 			case 0x57:
 				DEBUG_MSG("executing: pop");
+				frame -> topPopOperand();
+				frame -> movePc(1);
 				break;
 			case 0x58:
 				DEBUG_MSG("executing: pop2");
@@ -683,8 +686,8 @@ void ExecutionUnit::execute( Frame * frame)
 				{
 					DEBUG_MSG("executing: ireturn");
 					Operand * tmp = frame -> topPopOperand();
-					frameStack . pop();
-					frameStack . top() -> pushOperand(tmp);
+					frameStack -> pop();
+					frameStack -> top() -> pushOperand(tmp);
 					return;
 					break;
 				}
@@ -696,7 +699,7 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			case 0xb1:
 				DEBUG_MSG("executing: return");
-				frameStack . pop();
+				frameStack -> pop();
 				return;
 				break;
 
@@ -744,11 +747,13 @@ void ExecutionUnit::execute( Frame * frame)
 				DEBUG_MSG("executing: new");
 				frame -> pushOperand( new RefOperand(executeNew(frame)));
 				frame -> movePc(3);
+				objectHeap->garbageCollector->execute();
 				break;
 			case 0xbc:
 				DEBUG_MSG("executing: newarray");
 				frame -> pushOperand(new RefOperand(executeNewArray(frame)));
 				frame -> movePc(2);
+				objectHeap->garbageCollector->execute();
 				break;
 			case 0xbd:
 				DEBUG_MSG("executing: anewarray");
@@ -787,7 +792,7 @@ void ExecutionUnit::execute( Frame * frame)
 		}
 	}
 
-	frameStack.pop();
+	frameStack->pop();
 }
 
 void ExecutionUnit::executeInvoke(Frame * frame, u1 type)
@@ -828,21 +833,19 @@ void ExecutionUnit::executeInvoke(Frame * frame, u1 type)
 	frame -> javaClass -> getAttrName(nameIndexMethod, methodName);
 	frame -> javaClass -> getAttrName(descriptorIndex, methodDescription);
 
-	u2 numberOfparams = getNumberOfMethodParams(methodDescription);
+	int numberOfparams = (int)getNumberOfMethodParams(methodDescription);
 
 	Frame * invokedFrame = new Frame(methodName, methodDescription, className, frame -> stackFrame, frame -> classHeap);
 
-
 	if( type == 0xb8 or invokedFrame -> getMethod() . access_flags & ACC_NATIVE)
 		numberOfparams--;
-
 
 	for (int i = numberOfparams; i >= 0; i--)
 	{
 		invokedFrame -> storeOperand( i, frame -> topPopOperand());
 	}
 
-	frameStack.push(invokedFrame);
+	frameStack->push(invokedFrame);
 
 	execute(invokedFrame);
 }

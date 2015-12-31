@@ -26,7 +26,7 @@ int ClassFile::loadClass(std::string classFileName)
 	}
 	else
 	{
-		std::cout << "File load failed!" << std::endl;
+		std::cout << "File (" << classFileName << ") load failed!" << std::endl;
 		return 1;
 	}
 	magic = getu4(p); p += 4;
@@ -224,7 +224,7 @@ int ClassFile::loadMethods(char * &p)
 	    		*/
 	    		//if Attribute is "Code, save it to code_attr"
 		    	methods[i] . code_attr = new Code_attribute;
-		    	
+
 		    	std::string attr_value;
 		    	getAttrName( /*methods[i] . attributes[j] . */ attribute_name_index, attr_value);
 		    	if(attr_value.compare("Code") == 0){
@@ -390,8 +390,8 @@ int ClassFile::getFieldIndex(std::string fieldName)
 {
 	int fieldIndex = -1;
 	if(super_class != 0)
-	{		
-		std::string className = getClassNameFromRef(super_class);		
+	{
+		std::string className = getClassNameFromRef(super_class);
 		fieldIndex = classHeap -> getClass(className) -> getObjectSize();
 	}
 	for (int i = 0; i < fields_count; i++)
