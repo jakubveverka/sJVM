@@ -20,6 +20,7 @@ class ObjectHeap{
 			 	  ObjectHeap(ClassHeap * pClassHeap, ObjectTable * objectTable);
 		int  	  createObject(std::string className);
 		int		  createArray(int length, char arrayType);
+		int 	  createObjectArray(int length,std::string className);
 		int	 	  createString(std::string stringValue);
 		int  	  getFreeSpace(int objectSize);
 		Operand * getArrayLength(Operand * refOp);

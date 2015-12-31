@@ -2,6 +2,7 @@
 #include "../include/objectTable.hpp"
 #include "../include/objectRef.hpp"
 #include "../include/arrayRef.hpp"
+#include "../include/objectArrayRef.hpp"
 
 	ObjectTable::ObjectTable()
 {
@@ -19,6 +20,13 @@ int ObjectTable::addHeapArrayRef(int freeSpaceIndex, char arrayType)
 {
 	int freeTableIndex = findFreeIndex();
 	objectTable[freeTableIndex] = new ArrayRef(freeSpaceIndex, arrayType);
+	return freeTableIndex;
+}
+
+int ObjectTable::addHeapObjectArrayRef(int freeSpaceIndex, std::string className)
+{
+	int freeTableIndex = findFreeIndex();
+	objectTable[freeTableIndex] = new ObjectArrayRef(freeSpaceIndex, className);
 	return freeTableIndex;
 }
 

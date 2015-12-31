@@ -208,8 +208,15 @@ void ExecutionUnit::execute( Frame * frame)
 			//case 0x31:
 				//TODO daload
 			case 0x32:
-				DEBUG_MSG("executing: aaload");
-				break;
+				{
+					DEBUG_MSG("executing: aaload");
+					Operand * indexOp = frame -> topPopOperand();
+					Operand * refOp = frame -> topPopOperand();
+					Operand * valueOp = objectHeap -> loadArrayOp(refOp, indexOp);
+					frame -> pushOperand(valueOp);
+					frame -> movePc(1);
+					break;
+				}
 			case 0x33:
 				DEBUG_MSG("executing: baload");
 				break;
@@ -330,8 +337,15 @@ void ExecutionUnit::execute( Frame * frame)
 			//case 0x52:
 				//TODO dastore
 			case 0x53:
-				DEBUG_MSG("executing: aastore");
-				break;
+				{
+					DEBUG_MSG("executing: aastore");
+					Operand * valueOp = frame -> topPopOperand();
+					Operand * indexOp = frame -> topPopOperand();
+					Operand * refOp = frame -> topPopOperand();
+					objectHeap -> storeArrayOp(refOp, indexOp, valueOp);
+					frame -> movePc(1);	
+					break;
+				}
 			case 0x54:
 				DEBUG_MSG("executing: bastore");
 				break;
@@ -752,7 +766,7 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			case 0xbd:
 				DEBUG_MSG("executing: anewarray");
-				//frame -> pushOperand(new RefOperand(executeANewArray(frame)));
+				frame -> pushOperand(new RefOperand(executeANewArray(frame)));
 				frame -> movePc(3);
 				break;
 			case 0xbe:
@@ -828,7 +842,7 @@ void ExecutionUnit::executeInvoke(Frame * frame, u1 type)
 	frame -> javaClass -> getAttrName(nameIndexMethod, methodName);
 	frame -> javaClass -> getAttrName(descriptorIndex, methodDescription);
 
-	u2 numberOfparams = getNumberOfMethodParams(methodDescription);
+	int numberOfparams = (short)getNumberOfMethodParams(methodDescription);
 
 	Frame * invokedFrame = new Frame(methodName, methodDescription, className, frame -> stackFrame, frame -> classHeap);
 
@@ -859,6 +873,21 @@ int ExecutionUnit::executeNew(Frame * frame)
 	frame -> javaClass -> getAttrName(classNameIndex, className);
 
 	return objectHeap -> createObject(className);
+}
+
+int ExecutionUnit::executeANewArray(Frame * frame){
+	u2 constPoolClassRef = getu2(&frame -> getMethod() . code_attr -> code[frame -> getPc() + 1]);
+
+	u1 * p_classInfo = (u1*) frame -> javaClass -> constant_pool[constPoolClassRef];
+
+	u2 classNameIndex = getu2(p_classInfo + 1);
+
+	std::string className;
+	frame -> javaClass -> getAttrName(classNameIndex, className);
+	
+	int length = frame -> topPopOperand() -> getValue();
+
+	return objectHeap -> createObjectArray(length, className);
 }
 
 int ExecutionUnit::executeNewArray(Frame * frame)

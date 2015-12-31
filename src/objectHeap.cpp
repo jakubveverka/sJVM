@@ -5,6 +5,7 @@
 #include "../include/classHeap.hpp"
 #include "../include/operands/operand.hpp"
 #include "../include/operands/intOperand.hpp"
+#include "../include/operands/refOperand.hpp"
 #include "../include/operands/stringOperand.hpp"
 #include "../include/objectTable.hpp"
 
@@ -20,7 +21,7 @@
 int ObjectHeap::createObject(std::string className)
 {
 	ClassFile * javaClass = classHeap -> getClass(className);
-	
+
 	int objectSize	= javaClass -> getObjectSize();
 
 	int freeSpaceIndex = getFreeSpace(objectSize);
@@ -52,23 +53,35 @@ int	ObjectHeap::createArray(int length, char arrayType)
 
 	return objectTable -> addHeapArrayRef(freeSpaceIndex, arrayType);
 }
-		
+
+int ObjectHeap::createObjectArray(int length,std::string className)
+{
+	int freeSpaceIndex = getFreeSpace(length + 1);
+
+	data[freeSpaceIndex] = new IntOperand(length);
+	for (int i = freeSpaceIndex + 1; i < freeSpaceIndex + length + 1; i++)
+	{
+		data[i] = new RefOperand(-1);
+	}
+	return objectTable -> addHeapObjectArrayRef(freeSpaceIndex, className);
+}
+
 
 int ObjectHeap::getFreeSpace(int objectSize)
 {
 	int i = 0;
 	while(1){
-		while(data[i] != nullptr){		
+		while(data[i] != nullptr){
 			i++;
-			if(i > heapSize - 1) 
+			if(i > heapSize - 1)
 				return -1;
 		}
 		bool free = true;
 		for (int j = 0; j < objectSize; j++)
-		{	
+		{
 			if(i + j > heapSize - 1)
 				return -1;
-			if(data[i + j] != nullptr) 
+			if(data[i + j] != nullptr)
 				free = false;
 		}
 		if(free)
@@ -81,7 +94,7 @@ void ObjectHeap::setObjectValue(Operand * refOp, std::string fieldName, Operand 
 	ClassFile * javaClass = objectTable -> getClassRef(refOp -> getValue());
 
 	int fieldIndex = 0;
-	
+
 	fieldIndex += javaClass -> getFieldIndex(fieldName);
 
 	data[objectTable -> getHeapIndex(refOp -> getValue()) + fieldIndex] = valueOp;
@@ -114,7 +127,7 @@ void	  ObjectHeap::storeArrayOp(Operand * refOp, Operand * indexOp, Operand * va
 int	 	  ObjectHeap::createString(std::string stringValue)
 {
 	ClassFile * javaClass = classHeap -> getClass("java/lang/String");
-	
+
 	int freeSpaceIndex = getFreeSpace(1);
 
 	data[freeSpaceIndex] = new StringOperand(stringValue);

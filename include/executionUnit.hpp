@@ -17,6 +17,7 @@ class ExecutionUnit{
 		void executeInvoke(Frame *, u1 type);
 		int  executeNew(Frame *);
 		int  executeNewArray(Frame *);
+		int  executeANewArray(Frame * frame);
 		u2	 getNumberOfMethodParams(std::string p_description);
 		void putfield(Frame * frame);
 		void getField(Frame * frame);
