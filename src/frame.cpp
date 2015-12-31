@@ -35,8 +35,9 @@ int				   Frame::getPc()
 }
 
 void Frame::pushOperand(Operand *op)
-{
+{	
 	opStack.push(op);
+	std::cout <<  "Stack: " << opStack.size() << std::endl;
 }
 
 void Frame::movePc(int steps)

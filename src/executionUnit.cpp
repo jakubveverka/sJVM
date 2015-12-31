@@ -905,7 +905,11 @@ u2 ExecutionUnit::getNumberOfMethodParams(std::string p_description)
 	int length = p_description.size();
 
 	for (int i = 1; i < length; i++)
-	{
+	{	
+		if(p_description[i] == '[')
+		{
+			continue;
+		}
 		if(p_description[i] == 'L')
 		{
 			while(p_description[i] != ';')

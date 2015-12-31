@@ -57,7 +57,7 @@ public class SatDoubleIntInput {
         //int elementsCount = 2;
         //int[] formula = {0,-2,-3,0,-2,1};
         int elementsCount = 2;
-        int[][] formula = {{1, 0},{1}}; //{{-3, 0, -2, 1}, {-1}, {2, -2, -3, 3, -2, 0}, {-1}, {1, -2, 2}};
+        int[][] formula = {{-3, 0, -2, 1}, {-1}, {2, -2, -3, 3, -2, 0}, {-1}, {1, -2, 2}};
         //int elementsCount = 2;
         //int[] formula = {-3, 0,-1,0,-2,1};
         int prevResult = -1;
