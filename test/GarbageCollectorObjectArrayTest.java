@@ -3,21 +3,20 @@ package test;
 class GarbageCollectorObjectArrayTest
 {
          public static void test() {
-            int[][] a = new int[2][2];
+            int[][] b = {{3,4},{3,4}};
 
-            test2();
          }
 
-         public static void test2() {
+         /*public static void test2() {
             int[] c = new int[1];
-         }
+         }*/
 
         public static void main(String argc[])
         {
-          int[][] a = new int[2][1];
+          int[][] a = {{2,1},{2,1}};
 
           test();
 
-          int[] b = new int[2];
+          int[][] c = {{2,1},{2,1}};
         }
 }

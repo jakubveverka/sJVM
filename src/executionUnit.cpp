@@ -761,13 +761,11 @@ void ExecutionUnit::execute( Frame * frame)
 				DEBUG_MSG("executing: new");
 				frame -> pushOperand( new RefOperand(executeNew(frame)));
 				frame -> movePc(3);
-				objectHeap->garbageCollector->execute();
 				break;
 			case 0xbc:
 				DEBUG_MSG("executing: newarray");
 				frame -> pushOperand(new RefOperand(executeNewArray(frame)));
 				frame -> movePc(2);
-				objectHeap->garbageCollector->execute();
 				break;
 			case 0xbd:
 				DEBUG_MSG("executing: anewarray");
@@ -908,7 +906,7 @@ u2 ExecutionUnit::getNumberOfMethodParams(std::string p_description)
 	int length = p_description.size();
 
 	for (int i = 1; i < length; i++)
-	{	
+	{
 		if(p_description[i] == '[')
 		{
 			continue;

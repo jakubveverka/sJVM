@@ -5,6 +5,7 @@
 #include "../include/objectRef.hpp"
 #include "../include/arrayRef.hpp"
 #include "../include/objectArrayRef.hpp"
+#include "../include/objectArrayRef.hpp"
 #include "../include/garbageCollector.hpp"
 #include "../include/debugMsg.hpp"
 
@@ -72,6 +73,7 @@ void ObjectTable::print()
 	for(int i = 0; i < 10; i++) {
 		if(objectTable[i] == nullptr) DEBUG_MSG(std::to_string(i) + ". position is free");
 		else if(ObjectRef* o = dynamic_cast<ObjectRef*>(objectTable[i])) DEBUG_MSG(std::to_string(i) + ". position is ObjectRef with index " + std::to_string(o->getIndex()));
+		else if(ObjectArrayRef* a = dynamic_cast<ObjectArrayRef*>(objectTable[i])) DEBUG_MSG(std::to_string(i) + ". position is ObjectArrayRef with index " + std::to_string(a->getIndex()));
 		else if(ArrayRef* a = dynamic_cast<ArrayRef*>(objectTable[i])) DEBUG_MSG(std::to_string(i) + ". position is ArrayRef with index " + std::to_string(a->getIndex()));
 		else DEBUG_MSG(std::to_string(i) + ". position unknown operand");
 	}
