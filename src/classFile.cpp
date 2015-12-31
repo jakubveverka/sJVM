@@ -339,7 +339,7 @@ ClassFile * ClassFile::setClassByMethod(std::string p_methodName, std::string p_
 	{
 		return classHeap -> getClass(getClassNameFromRef(super_class)) -> setClassByMethod(p_methodName, p_methodDescription);
 	}
-	throw 20;
+	throw 23;
 }
 
 

@@ -854,7 +854,8 @@ void ExecutionUnit::executeInvoke(Frame * frame, u1 type)
 
 	for (int i = numberOfparams; i >= 0; i--)
 	{
-		invokedFrame -> storeOperand( i, frame -> topPopOperand());
+		Operand* o = frame -> topPopOperand();
+		invokedFrame -> storeOperand(i, o);
 	}
 
 	frameStack->push(invokedFrame);
@@ -1023,6 +1024,22 @@ void ExecutionUnit::executeNativeMethod(Frame * frame)
 
     std::string methodSig = className + "." + methodName + ":" + methodDescription;
 
-    if(methodSig.compare("java/io/PrintStream.print:(Ljava/lang/String;)V") == 0)
+	 DEBUG_MSG("method signature: " + methodSig);
+	 
+
+    if(methodSig.compare("java/io/PrintStream.print:(Ljava/lang/String;)V") == 0) {
     	void_PrintStream_Print_String(frame, objectHeap);
+	} else if(methodSig.compare("java/io/PrintStream.print:(I)V") == 0) {
+		void_PrintStream_Print_Int(frame, objectHeap);
+	} else if(methodSig.compare("test/our/objects/StdInputReader.readString:()Ljava/lang/String;") == 0) {
+		string_StdInputReader_ReadString_Void(frame, objectHeap);
+	} else if(methodSig.compare("test/our/objects/FileParserReader.readElementsCount:(Ljava/lang/String;)I") == 0) {
+		int_FileParserReader_readElementsCount_String(frame, objectHeap);
+	} else if(methodSig.compare("test/our/objects/FileParserReader.readAndParseFormula:(Ljava/lang/String;)[[I") == 0) {
+		twoDimenIntArray_FileParserReader_readAndParseFormula_String(frame, objectHeap);
+	} else if(methodSig.compare("test/our/objects/FileWriter.writeString:(Ljava/lang/String;Ljava/lang/String;)I") == 0) {
+		int_FileWriter_writeString_String_String(frame, objectHeap);
+	} else if(methodSig.compare("test/our/objects/FileWriter.writeInt:(Ljava/lang/String;I)I") == 0) {
+		int_FileWriter_writeInt_String_Int(frame, objectHeap);
+	}
 }

@@ -1,6 +1,9 @@
 package test.SAT;
 
 import java.util.ArrayList;
+import test.our.objects.StdInputReader;
+import test.our.objects.FileParserReader;
+import test.our.objects.FileWriter;
 
 public class SatDoubleIntInput {
 
@@ -49,17 +52,24 @@ public class SatDoubleIntInput {
     }
 
     public static void main(String[] args) {
-        // -1 == or
-        // -2 == and
-        // -3 == neg
-        //int elementsCount = 4;
-        //int[] formula = {0,-2,1,-1,2,-2,-3,3};
-        //int elementsCount = 2;
-        //int[] formula = {0,-2,-3,0,-2,1};
-        int elementsCount = 2;
-        int[][] formula = {{-3, 0, -2, 1}, {-1}, {2, -2, -3, 3, -2, 0}, {-1}, {1, -2, 2}};
-        //int elementsCount = 2;
-        //int[] formula = {-3, 0,-1,0,-2,1};
+        StdInputReader r = new StdInputReader();
+ 		  FileParserReader fr = new FileParserReader();
+ 		  FileWriter fw = new FileWriter();
+
+        System.out.print("Sat solver\n");
+        System.out.print("Enter input file: ");
+        String inputFile = r.readString();
+        System.out.print("Enter output file: ");
+        String outputFile = r.readString();
+
+        int elementsCount = fr.readElementsCount(inputFile);
+
+ 		  if(elementsCount <= 0) {
+ 			      System.out.print("input file error");
+               return;
+ 		  }
+
+ 		  int[][] formula = fr.readAndParseFormula(inputFile);
         int prevResult = -1;
         int isTrue = 0;
 
@@ -67,7 +77,8 @@ public class SatDoubleIntInput {
         for(int i = 0; i < elementsCount; i++) countOfPossibleCombinations *= 2;
 
         for(int combination = 0; combination < countOfPossibleCombinations; combination++) {
-            //System.out.println("Testing combination " + Integer.toBinaryString(combination));
+            System.out.print("Testing combination ");
+            System.out.print(combination);
             prevResult = -1;
             for(int i = 0; i < formula.length-1; i+=2) {
                 int moduloAdd = 0;
@@ -105,10 +116,17 @@ public class SatDoubleIntInput {
                 i += moduloAdd;
             }
             if(prevResult == 1) {
-                //System.out.println("----> SAT splnitelny pro " + Integer.toBinaryString(combination));
+                String s = "SAT splnitelny pro ";
+                System.out.print(s);
+                System.out.print(combination);
+                fw.writeString(outputFile, s);
+                fw.writeInt(outputFile, combination);
                 isTrue = 1;
             }
         }
-        //if(isTrue == 0) System.out.println("SAT nesplnitelny.");
+        if(isTrue == 0) {
+           System.out.print("SAT nesplnitelny.");
+           fw.writeString(outputFile, "SAT nesplnitelny.");
+        }
     }
 }
