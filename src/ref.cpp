@@ -5,3 +5,17 @@
 {
 
 }
+
+void Ref::setGcNumber(int pGcNumber)
+{
+	gcNumber = pGcNumber;
+}
+
+int  Ref::getGcNumber() {
+	return gcNumber;
+}
+
+int Ref::getIndex() const
+{
+	return heapIndex;
+}

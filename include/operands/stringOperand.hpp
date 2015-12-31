@@ -12,6 +12,7 @@ class StringOperand : public Operand {
 					StringOperand(std::string val);
 		std::string	getStringValue() const;
 		void 		setStringValue(std::string val);
+		Operand* clone();
 			  		~StringOperand();
 };
 

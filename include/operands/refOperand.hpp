@@ -10,6 +10,7 @@ class RefOperand : public Operand {
 				RefOperand(int i);
 		int 	getValue() const;
 		void 	setValue(int i);
+		Operand* clone();
 			  	~RefOperand();
 };
 

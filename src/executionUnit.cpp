@@ -8,10 +8,11 @@
 #include "../include/operands/intOperand.hpp"
 #include "../include/operands/refOperand.hpp"
 #include "../include/objectHeap.hpp"
+#include "../include/garbageCollector.hpp"
 
 #include "../include/nativeMethods.hpp"
 
-	 ExecutionUnit::ExecutionUnit(std::stack<Frame*> p_frameStack, ObjectHeap * p_objectHeap)
+	 ExecutionUnit::ExecutionUnit(std::stack<Frame*>* p_frameStack, ObjectHeap * p_objectHeap)
 {
 	frameStack = p_frameStack;
 	objectHeap = p_objectHeap;
@@ -343,7 +344,7 @@ void ExecutionUnit::execute( Frame * frame)
 					Operand * indexOp = frame -> topPopOperand();
 					Operand * refOp = frame -> topPopOperand();
 					objectHeap -> storeArrayOp(refOp, indexOp, valueOp);
-					frame -> movePc(1);	
+					frame -> movePc(1);
 					break;
 				}
 			case 0x54:
@@ -359,6 +360,8 @@ void ExecutionUnit::execute( Frame * frame)
 			// STACK ///////////////////////////////////////////////////////////////
 			case 0x57:
 				DEBUG_MSG("executing: pop");
+				frame -> topPopOperand();
+				frame -> movePc(1);
 				break;
 			case 0x58:
 				DEBUG_MSG("executing: pop2");
@@ -697,8 +700,8 @@ void ExecutionUnit::execute( Frame * frame)
 				{
 					DEBUG_MSG("executing: ireturn");
 					Operand * tmp = frame -> topPopOperand();
-					frameStack . pop();
-					frameStack . top() -> pushOperand(tmp);
+					frameStack -> pop();
+					frameStack -> top() -> pushOperand(tmp);
 					return;
 					break;
 				}
@@ -710,7 +713,7 @@ void ExecutionUnit::execute( Frame * frame)
 				break;
 			case 0xb1:
 				DEBUG_MSG("executing: return");
-				frameStack . pop();
+				frameStack -> pop();
 				return;
 				break;
 
@@ -758,11 +761,13 @@ void ExecutionUnit::execute( Frame * frame)
 				DEBUG_MSG("executing: new");
 				frame -> pushOperand( new RefOperand(executeNew(frame)));
 				frame -> movePc(3);
+				objectHeap->garbageCollector->execute();
 				break;
 			case 0xbc:
 				DEBUG_MSG("executing: newarray");
 				frame -> pushOperand(new RefOperand(executeNewArray(frame)));
 				frame -> movePc(2);
+				objectHeap->garbageCollector->execute();
 				break;
 			case 0xbd:
 				DEBUG_MSG("executing: anewarray");
@@ -801,7 +806,7 @@ void ExecutionUnit::execute( Frame * frame)
 		}
 	}
 
-	frameStack.pop();
+	frameStack->pop();
 }
 
 void ExecutionUnit::executeInvoke(Frame * frame, u1 type)
@@ -846,17 +851,15 @@ void ExecutionUnit::executeInvoke(Frame * frame, u1 type)
 
 	Frame * invokedFrame = new Frame(methodName, methodDescription, className, frame -> stackFrame, frame -> classHeap);
 
-
 	if( type == 0xb8 or invokedFrame -> getMethod() . access_flags & ACC_NATIVE)
 		numberOfparams--;
-
 
 	for (int i = numberOfparams; i >= 0; i--)
 	{
 		invokedFrame -> storeOperand( i, frame -> topPopOperand());
 	}
 
-	frameStack.push(invokedFrame);
+	frameStack->push(invokedFrame);
 
 	execute(invokedFrame);
 }
@@ -884,7 +887,7 @@ int ExecutionUnit::executeANewArray(Frame * frame){
 
 	std::string className;
 	frame -> javaClass -> getAttrName(classNameIndex, className);
-	
+
 	int length = frame -> topPopOperand() -> getValue();
 
 	return objectHeap -> createObjectArray(length, className);
@@ -949,6 +952,8 @@ void ExecutionUnit::putfield(Frame * frame)
 
 	Operand * valueOp = frame -> topPopOperand();
 
+	valueOp = valueOp->clone();
+
 	Operand * refOp = frame -> topPopOperand();
 
 	DEBUG_MSG("Setting value of " + fieldName + " to: " + std::to_string(valueOp -> getValue()));
@@ -979,6 +984,8 @@ void ExecutionUnit::getField(Frame * frame)
 	Operand * refOp = frame -> topPopOperand();
 
 	Operand * valueOp = objectHeap -> getObjectValue(refOp, fieldName);
+
+	valueOp = valueOp->clone();
 
 	DEBUG_MSG("Getting value of " + fieldName + ". Value: " + std::to_string(valueOp -> getValue()));
 

@@ -6,7 +6,7 @@
 #include "../include/debugMsg.hpp"
 
 
-	Frame::Frame(std::string p_methodName, std::string p_methodDescription, std::string p_className, std::stack<Frame*> p_stackFrame, ClassHeap * p_classHeap )
+	Frame::Frame(std::string p_methodName, std::string p_methodDescription, std::string p_className, std::stack<Frame*>* p_stackFrame, ClassHeap * p_classHeap )
 {
 
 	classHeap = p_classHeap;
@@ -17,10 +17,14 @@
 	if(method . access_flags & ACC_NATIVE )
 	{
 		localVariables.reserve(5);
+		localVariablesSize = 5;
 	}
 	else{
 		localVariables.reserve(method . code_attr -> max_locals);
+		localVariablesSize = method . code_attr -> max_locals;
 	}
+
+	for(int i = 0; i < localVariablesSize; i++) localVariables[i] = nullptr;
 
 	pc = 0;
 }
@@ -71,3 +75,7 @@ void Frame::printOpStack()
 	DEBUG_MSG("end of printing");
 }
 
+std::stack<Operand*>* Frame::getOpStack()
+{
+	return &opStack;
+}
