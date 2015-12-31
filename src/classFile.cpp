@@ -27,7 +27,7 @@ int ClassFile::loadClass(std::string classFileName)
 	else
 	{
 		std::cout << "File (" << classFileName << ") load failed!" << std::endl;
-		return 1;
+		throw 25;
 	}
 	magic = getu4(p); p += 4;
 

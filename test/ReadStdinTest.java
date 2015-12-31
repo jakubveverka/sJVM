@@ -19,6 +19,7 @@ public class ReadStdinTest {
 
 		if(elementsCount <= 0) {
 			System.out.print("input file error");
+			return;
 		}
 
 		int[][] formula = fr.readAndParseFormula(inputFile);

@@ -1,8 +1,0 @@
-SAT splnitelny pro 10
-SAT splnitelny pro 101
-SAT splnitelny pro 110
-SAT splnitelny pro 111
-SAT splnitelny pro 1010
-SAT splnitelny pro 1110
-SAT splnitelny pro 1111
-input.txt

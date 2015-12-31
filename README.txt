@@ -49,3 +49,13 @@ V programu jsou zapnuty podpůrné debug výstupy prováděných instrukcí. Pro
 - Popis výsledné práce -
 
 Vytvořili jsme omezenou verzi Java Virtual Machine. Jsou podporovány objekty, které jsou organizovány pomocí Object Table na haldě. Omezili jsme práci s operandy pouze na Integer, stringové řetězce a vstup a výstup do souboru. O uvolňování objektů z haldy se stará naimplementovaný garbage collector.
+
+- Řešený problém v Javě -
+
+SAT solver.
+
+Spuštění SATu - ./bin/jvm test/SAT/SatDoubleIntInput
+
+Příklad vstupu pro SAT je v souboru test/SAT/input.txt (programu zadáte jako input.txt, output soubor bude ve stejné složce). První řádek je počet proměnných ve formuli. Druhý řádek je již samotná formule.
+Proměnné musí jít abecedně po sobě a operand s proměnnou by měla oddělovat mezera (kromě negace). Po a před případnými závorkami mezera nenásleduje, případně nepředchází.
+Závorky jsou se mohou vnořovat jen do jedné úrovně.

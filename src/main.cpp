@@ -26,21 +26,22 @@ int main(int argc, char * argv[]){
 	objectHeap->setGarbageCollector(garbageCollector);
 
 
-	classHeap -> getClass("test/java/lang/Object");
-	classHeap -> getClass("test/java/lang/String");
-	classHeap -> getClass("test/java/io/PrintStream");
-
-	Frame * initFrame = new Frame("main","([Ljava/lang/String;)V", argv[1], &stackFrame, classHeap);
-	stackFrame.push(initFrame);
-
-	ExecutionUnit * ex = new ExecutionUnit(&stackFrame, objectHeap);
-
-	Frame * frame = stackFrame.top();
-
 	try {
+		classHeap -> getClass("test/java/lang/Object");
+		classHeap -> getClass("test/java/lang/String");
+		classHeap -> getClass("test/java/io/PrintStream");
+
+		Frame * initFrame = new Frame("main","([Ljava/lang/String;)V", argv[1], &stackFrame, classHeap);
+		stackFrame.push(initFrame);
+
+		ExecutionUnit * ex = new ExecutionUnit(&stackFrame, objectHeap);
+
+		Frame * frame = stackFrame.top();
+
 		ex -> execute(frame);
 	} catch(int e) {
 		if(e == 21) std::cout << "Out of memory exception" << std::endl;
+		else if( e == 25) std::cout << "Class file load failed. Maybe wrong Class file name?" << std::endl;
 		else std::cout << "Exception " << e << " occured" << std::endl;
 		return 1;
 	}
