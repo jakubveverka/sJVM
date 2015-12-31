@@ -1,3 +1,5 @@
+package test;
+
 class ShiftTests
 {
 	public static void main(String argc[])

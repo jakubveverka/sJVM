@@ -8,7 +8,7 @@ SRCEXT    := cpp
 SOURCES   := $(wildcard $(SRCDIR)/*.$(SRCEXT)) $(wildcard $(SRCDIR)/operands/*.$(SRCEXT))
 OBJECTS   := $(subst $(SRCDIR),$(BUILDDIR),$(SOURCES:.cpp=.o))
 
-CFLAGS := -g -Wall -std=c++11
+CFLAGS := -g -std=c++11
 
 $(TARGET): $(OBJECTS) | $(BIN)
 	@echo " Linking..."

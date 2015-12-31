@@ -2,14 +2,14 @@
 #include "../include/objectTable.hpp"
 #include "../include/objectHeap.hpp"
 #include "../include/frame.hpp"
-#include "../include/operands/RefOperand.hpp"
+#include "../include/operands/refOperand.hpp"
 #include "../include/ref.hpp"
 #include "../include/garbageCollector.hpp"
 #include "../include/debugMsg.hpp"
 #include "../include/objectRef.hpp"
 #include "../include/arrayRef.hpp"
 #include "../include/objectArrayRef.hpp"
-#include "../include/operands/IntOperand.hpp"
+#include "../include/operands/intOperand.hpp"
 
       GarbageCollector::GarbageCollector(ObjectHeap* p_objectHeap, ObjectTable* p_objectTable, std::stack<Frame*>* p_stackFrame)
 {

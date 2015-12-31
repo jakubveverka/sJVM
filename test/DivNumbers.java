@@ -1,3 +1,5 @@
+package test;
+
 class DivNumbers
 {
         public static void main(String argc[])

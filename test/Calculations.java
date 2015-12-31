@@ -1,3 +1,5 @@
+package test;
+
 class Calculations
 {
 	public static void main(String argc[])

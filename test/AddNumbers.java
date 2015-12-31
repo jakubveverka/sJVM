@@ -1,3 +1,5 @@
+package test;
+
 class AddNumbers
 {
 	public static void main(String argc[])

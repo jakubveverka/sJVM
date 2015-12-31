@@ -1,3 +1,5 @@
+package test;
+
 class BitOperations
 {
 	public static void main(String argc[])

@@ -1,3 +1,5 @@
+package test;
+
 class IIncTest
 {
 	public static void main(String argc[])

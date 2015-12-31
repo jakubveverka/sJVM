@@ -1,3 +1,5 @@
+package test;
+
 class IRemTest
 {
 	public static void main(String argc[])

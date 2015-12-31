@@ -1,3 +1,5 @@
+package test;
+
 class BigInt
 {
 	public static void main(String argc[])

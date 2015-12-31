@@ -1,3 +1,5 @@
+package test;
+
 class MulNumbers
 {
         public static void main(String argc[])

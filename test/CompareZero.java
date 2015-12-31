@@ -1,3 +1,5 @@
+package test;
+
 class CompareZero
 {
 	public static void main(String argc[])

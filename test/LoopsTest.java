@@ -1,3 +1,5 @@
+package test;
+
 class LoopsTest
 {
 	public static void main(String argc[])
